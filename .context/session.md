@@ -1,13 +1,13 @@
 # Current State
 
-Updated: 1791971219
+Updated: 1791983819
 
 Now:
-- Done: Fedora Cageのログアウトボタンからセッション終了に成功。READMEと仕様書に反映。
-- Pending: FedoraでHost更新ボタンとP3状態取得を実機確認。
+- Done: `foxbook-touch`ブランチを自分のGitHub Forkへpushし、追跡設定を完了。
+- Pending: Surface向けのキーボードサイズ調整と実機確認。
 
 Next:
-- FedoraでHost更新ボタンと電池・ネットワーク・音量表示を確認。
+- サイズを調整し、一時読み込みで確認してからcommit・pushする。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -15,9 +15,9 @@ Constraints:
 
 Relevant:
 - context: foxbook-control
+- repo: Firefox-On-Screen-Keyboard
+- repo: THE-SESSION-TOOLS
 - repo: foxbook-control
 - repo: specification
 - cwd: /home/tuyomori/project/foxbook-control
-- file: .context/session.md
-- file: .context/turns.jsonl
 
