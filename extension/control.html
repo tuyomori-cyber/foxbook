@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Foxbook Control</title>
+  <link rel="stylesheet" href="control.css">
+  <script src="control.js" defer></script>
+</head>
+<body>
+  <main>
+    <h1>Foxbook Control</h1>
+    <p>システム情報</p>
+    <button id="system-info" type="button">システム情報を表示</button>
+    <section aria-labelledby="result-title">
+      <h2 id="result-title">実行結果</h2>
+      <p id="status" role="status" aria-live="polite">操作を選択してください。</p>
+      <pre id="output" hidden></pre>
+      <p id="error-code" class="error-code" hidden></p>
+    </section>
+  </main>
+</body>
+</html>
