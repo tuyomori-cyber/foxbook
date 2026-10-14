@@ -21,6 +21,12 @@ button {
   cursor: pointer;
 }
 
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
 section {
   margin-top: 2rem;
 }

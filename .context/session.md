@@ -1,13 +1,12 @@
 # Current State
 
-Updated: 1791952666
+Updated: 1791970861
 
 Now:
-- Done: about:debuggingからmanifest.jsonを手動で一時読み込み
-- Pending: 拡張アクションからの画面表示とsystem_info結果の手動確認
+- Pending: FedoraのFirefox起動時にFOXBOOK_CAGE_SESSION=1を渡し、Cageログアウトを実機確認する。
 
 Next:
-- 制御ページでシステム情報を表示し、結果を確認する
+- 起動スクリプトを確認してCageからFirefoxを起動し直す。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.

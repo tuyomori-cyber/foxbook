@@ -17,6 +17,7 @@ import tempfile
 HOST_NAME = "foxbook_control"
 EXTENSION_ID = "foxbook-control@foxbook.example"
 SOURCE_HOST = Path(__file__).resolve().parents[1] / "native_host" / "foxbook_control.py"
+SOURCE_INSTALLER = Path(__file__).resolve()
 
 
 def package_name(command: list[str]) -> str | None:
@@ -114,8 +115,10 @@ def install(firefox: Path, home: Path) -> str:
     compile(host_bytes, str(SOURCE_HOST), "exec")
 
     host_path = home / ".local" / "share" / "foxbook-control" / "foxbook_control.py"
+    source_path = host_path.parent / "install_source.json"
     manifest_path = home / ".mozilla" / "native-messaging-hosts" / f"{HOST_NAME}.json"
     check_target(host_path)
+    check_target(source_path)
     check_target(manifest_path)
     manifest = {
         "name": HOST_NAME,
@@ -125,6 +128,7 @@ def install(firefox: Path, home: Path) -> str:
         "allowed_extensions": [EXTENSION_ID],
     }
     manifest_bytes = (json.dumps(manifest, ensure_ascii=False, indent=2) + "\n").encode("utf-8")
+    source_bytes = (json.dumps({"installer": str(SOURCE_INSTALLER), "firefox": str(firefox)}, indent=2) + "\n").encode("utf-8")
     json.loads(manifest_bytes)
 
     # All checks above complete before the first installation write.
@@ -132,22 +136,31 @@ def install(firefox: Path, home: Path) -> str:
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     staged: list[Path] = []
     old_host: Path | None = None
+    old_source: Path | None = None
     old_manifest: Path | None = None
     host_replaced = False
+    source_replaced = False
     manifest_replaced = False
     try:
         new_host = staged_file(host_path.parent, host_bytes, 0o700)
         staged.append(new_host)
+        new_source = staged_file(source_path.parent, source_bytes, 0o600)
+        staged.append(new_source)
         new_manifest = staged_file(manifest_path.parent, manifest_bytes, 0o600)
         staged.append(new_manifest)
         old_host = backup(host_path)
         if old_host:
             staged.append(old_host)
+        old_source = backup(source_path)
+        if old_source:
+            staged.append(old_source)
         old_manifest = backup(manifest_path)
         if old_manifest:
             staged.append(old_manifest)
         os.replace(new_host, host_path)
         host_replaced = True
+        os.replace(new_source, source_path)
+        source_replaced = True
         os.replace(new_manifest, manifest_path)
         manifest_replaced = True
     except BaseException:
@@ -156,6 +169,11 @@ def install(firefox: Path, home: Path) -> str:
                 os.replace(old_manifest, manifest_path)
             else:
                 manifest_path.unlink(missing_ok=True)
+        if source_replaced:
+            if old_source:
+                os.replace(old_source, source_path)
+            else:
+                source_path.unlink(missing_ok=True)
         if host_replaced:
             if old_host:
                 os.replace(old_host, host_path)

@@ -10,13 +10,26 @@
 <body>
   <main>
     <h1>Foxbook Control</h1>
-    <p>システム情報</p>
-    <button id="system-info" type="button">システム情報を表示</button>
+    <p>状態を確認</p>
+    <div class="actions">
+      <button data-action="system_info" type="button">システム情報</button>
+      <button data-action="battery_status" type="button">電池</button>
+      <button data-action="network_status" type="button">ネットワーク</button>
+      <button data-action="audio_status" type="button">音量</button>
+    </div>
     <section aria-labelledby="result-title">
       <h2 id="result-title">実行結果</h2>
       <p id="status" role="status" aria-live="polite">操作を選択してください。</p>
       <pre id="output" hidden></pre>
       <p id="error-code" class="error-code" hidden></p>
+    </section>
+    <section aria-labelledby="session-title">
+      <h2 id="session-title">セッション</h2>
+      <button id="cage-logout" type="button">Cageからログアウト</button>
+    </section>
+    <section aria-labelledby="host-title">
+      <h2 id="host-title">Native Host</h2>
+      <button data-action="update_host" type="button">Hostを更新</button>
     </section>
   </main>
 </body>

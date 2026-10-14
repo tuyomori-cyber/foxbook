@@ -3,8 +3,10 @@ import json
 import struct
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 import unittest
+from unittest import mock
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "native_host"))
@@ -43,6 +45,90 @@ class NativeHostTests(unittest.TestCase):
             host.process_request({"action": "system_info"}, runner),
             {"success": True, "output": "Linux test\n", "error": None},
         )
+
+    def test_status_actions_use_fixed_commands(self):
+        expected = {
+            "network_status": ["/usr/bin/nmcli", "-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "device", "status"],
+            "audio_status": ["/usr/bin/wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"],
+        }
+        for action, command in expected.items():
+            with self.subTest(action=action):
+                def runner(actual, **kwargs):
+                    self.assertEqual(actual, command)
+                    self.assertEqual(kwargs["timeout"], 5)
+                    return subprocess.CompletedProcess(actual, 0, stdout="status\n", stderr="")
+
+                self.assertEqual(host.process_request({"action": action}, runner)["output"], "status\n")
+
+    def test_battery_status_reads_only_battery_supplies(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            battery = root / "BAT0"
+            battery.mkdir()
+            (battery / "type").write_text("Battery\n")
+            (battery / "capacity").write_text("73\n")
+            (battery / "status").write_text("Charging\n")
+            mains = root / "AC"
+            mains.mkdir()
+            (mains / "type").write_text("Mains\n")
+
+            def forbidden_runner(*args, **kwargs):
+                raise AssertionError("OS command must not run")
+
+            result = host.process_request({"action": "battery_status"}, forbidden_runner, root)
+            self.assertEqual(result["output"], "BAT0: 73%（充電中）")
+
+    def test_battery_status_without_battery(self):
+        with tempfile.TemporaryDirectory() as directory:
+            result = host.process_request({"action": "battery_status"}, battery_root=Path(directory))
+            self.assertEqual(result["output"], "バッテリーが見つかりません。")
+
+    def test_cage_logout_is_rejected_outside_marked_session(self):
+        def forbidden_runner(*args, **kwargs):
+            raise AssertionError("logout must not run outside Cage")
+
+        result = host.process_request({"action": "cage_logout"}, forbidden_runner, environment={})
+        self.assertEqual(result["error"]["code"], "PERMISSION_DENIED")
+
+    def test_cage_logout_targets_only_callers_session(self):
+        def runner(command, **kwargs):
+            self.assertEqual(command, ["/usr/bin/loginctl", "--no-ask-password", "terminate-session", ""])
+            self.assertEqual(kwargs["timeout"], 5)
+            return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+        result = host.process_request({"action": "cage_logout"}, runner, environment={"FOXBOOK_CAGE_SESSION": "1"})
+        self.assertEqual(result, {"success": True, "output": "", "error": None})
+
+    def test_host_update_uses_recorded_installer_and_firefox(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            scripts = root / "scripts"
+            source_host = root / "native_host" / "foxbook_control.py"
+            scripts.mkdir()
+            source_host.parent.mkdir()
+            installer = scripts / "install_host.py"
+            installer.write_text("# installer\n")
+            source_host.write_text("# host\n")
+            firefox = root / "firefox"
+            config = root / "install_source.json"
+            config.write_text(json.dumps({"installer": str(installer), "firefox": str(firefox)}))
+            self.assertEqual(host.update_command(config), [sys.executable, str(installer), "--firefox", str(firefox)])
+
+            def runner(command, **kwargs):
+                self.assertEqual(command, [sys.executable, str(installer), "--firefox", str(firefox)])
+                self.assertEqual(kwargs["timeout"], host.UPDATE_TIMEOUT_SECONDS)
+                return subprocess.CompletedProcess(command, 0, stdout="Native Hostを登録しました。\n", stderr="")
+
+            with mock.patch.object(host, "update_command", return_value=host.update_command(config)):
+                self.assertTrue(host.process_request({"action": "update_host"}, runner)["success"])
+
+    def test_host_update_without_recorded_source_fails_without_command(self):
+        def forbidden_runner(*args, **kwargs):
+            raise AssertionError("installer must not run")
+
+        with mock.patch.object(host, "update_command", side_effect=FileNotFoundError()):
+            result = host.process_request({"action": "update_host"}, forbidden_runner)
+        self.assertEqual(result["error"]["code"], "COMMAND_FAILED")
 
     def test_extra_fields_are_rejected_without_running_command(self):
         def forbidden_runner(*args, **kwargs):

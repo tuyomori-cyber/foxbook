@@ -5,16 +5,26 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import struct
 import subprocess
 import sys
-from typing import Any, Callable
+from pathlib import Path
+from typing import Any, Callable, Mapping
 
 
 MAX_REQUEST_BYTES = 65536
 COMMAND_TIMEOUT_SECONDS = 5
+UPDATE_TIMEOUT_SECONDS = 30
 LOGGER = logging.getLogger("foxbook_control")
-COMMANDS = {"system_info": ("/usr/bin/uname", "-a")}
+COMMANDS = {
+    "system_info": ("/usr/bin/uname", "-a"),
+    "network_status": ("/usr/bin/nmcli", "-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "device", "status"),
+    "audio_status": ("/usr/bin/wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"),
+    "cage_logout": ("/usr/bin/loginctl", "--no-ask-password", "terminate-session", ""),
+}
+BATTERY_ROOT = Path("/sys/class/power_supply")
+INSTALL_SOURCE_PATH = Path(__file__).resolve().with_name("install_source.json")
 
 
 def response(success: bool, output: str = "", code: str | None = None, message: str = "") -> dict[str, Any]:
@@ -25,20 +35,70 @@ def response(success: bool, output: str = "", code: str | None = None, message: 
     }
 
 
-def process_request(request: Any, run_command: Callable[..., Any] = subprocess.run) -> dict[str, Any]:
+def battery_status(root: Path = BATTERY_ROOT) -> str:
+    batteries = []
+    for supply in sorted(root.iterdir()):
+        if (supply / "type").read_text(encoding="utf-8").strip() != "Battery":
+            continue
+        capacity = int((supply / "capacity").read_text(encoding="utf-8").strip())
+        if not 0 <= capacity <= 100:
+            raise ValueError("battery capacity out of range")
+        state = (supply / "status").read_text(encoding="utf-8").strip()
+        state_name = {
+            "Charging": "充電中", "Discharging": "放電中", "Full": "満充電",
+            "Not charging": "充電停止中", "Unknown": "状態不明",
+        }.get(state, "状態不明")
+        batteries.append(f"{supply.name}: {capacity}%（{state_name}）")
+    return "\n".join(batteries) if batteries else "バッテリーが見つかりません。"
+
+
+def update_command(source_path: Path = INSTALL_SOURCE_PATH) -> list[str]:
+    config = json.loads(source_path.read_text(encoding="utf-8"))
+    if not isinstance(config, dict) or set(config) != {"installer", "firefox"}:
+        raise ValueError("invalid install source")
+    installer, firefox = config["installer"], config["firefox"]
+    if not all(isinstance(value, str) and Path(value).is_absolute() for value in (installer, firefox)):
+        raise ValueError("invalid install source paths")
+    if Path(installer).name != "install_host.py" or not Path(installer).is_file():
+        raise ValueError("installer is unavailable")
+    if not (Path(installer).parent.parent / "native_host" / "foxbook_control.py").is_file():
+        raise ValueError("host source is unavailable")
+    return [sys.executable, installer, "--firefox", firefox]
+
+
+def process_request(
+    request: Any, run_command: Callable[..., Any] = subprocess.run, battery_root: Path = BATTERY_ROOT,
+    environment: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
     if not isinstance(request, dict) or set(request) != {"action"} or not isinstance(request["action"], str):
         return response(False, code="INVALID_REQUEST", message="要求の形式が正しくありません。")
 
-    command = COMMANDS.get(request["action"])
-    if command is None:
+    action = request["action"]
+    if action not in COMMANDS and action not in ("battery_status", "update_host"):
         return response(False, code="UNKNOWN_ACTION", message="未登録の操作です。")
+    if action == "cage_logout" and (environment if environment is not None else os.environ).get("FOXBOOK_CAGE_SESSION") != "1":
+        return response(False, code="PERMISSION_DENIED", message="Cageセッションからのみログアウトできます。")
 
     try:
+        if action == "battery_status":
+            return response(True, output=battery_status(battery_root))
+        if action == "update_host":
+            try:
+                command = update_command()
+            except (OSError, ValueError) as exc:
+                LOGGER.warning("host update source unavailable: %s", exc)
+                return response(False, code="COMMAND_FAILED", message="更新元が見つかりません。端末からインストーラーを再実行してください。")
+        else:
+            command = list(COMMANDS[action])
         result = run_command(
-            list(command), capture_output=True, text=True, timeout=COMMAND_TIMEOUT_SECONDS, check=False
+            command, capture_output=True, text=True,
+            timeout=UPDATE_TIMEOUT_SECONDS if action == "update_host" else COMMAND_TIMEOUT_SECONDS, check=False
         )
     except subprocess.TimeoutExpired:
-        LOGGER.warning("command timeout: action=%s seconds=%s", request["action"], COMMAND_TIMEOUT_SECONDS)
+        LOGGER.warning(
+            "command timeout: action=%s seconds=%s", action,
+            UPDATE_TIMEOUT_SECONDS if action == "update_host" else COMMAND_TIMEOUT_SECONDS,
+        )
         return response(False, code="TIMEOUT", message="操作が時間内に完了しませんでした。")
     except PermissionError as exc:
         LOGGER.warning("permission denied: action=%s errno=%s", request["action"], exc.errno)

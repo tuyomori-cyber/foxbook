@@ -153,6 +153,12 @@ Cage（Surface実機での運用時）
 - MVP後のFirefox拡張の常用向け署名・配布方法。
 - 開発環境のXubuntu 24.04では、現在の`/usr/bin/firefox`がSnap版を起動するラッパーである。MVP検証用バイナリの配置先は`~/.local/opt/foxbook-firefox/`、専用プロファイルの保存先は`~/.local/share/foxbook-control/firefox-profile/`に確定。起動にはXubuntu専用スクリプトで`-profile`と`--no-remote`を指定する。
 - Fedora実機のFirefoxは`/usr/bin/firefox`、RPMパッケージ`firefox-157.0-1.fc43.x86_64`。提示された`flatpak list --app | grep -i firefox`には結果がない。
+- 2026-10-14にFedora KDE PlasmaとFedora Cageで既存MVPの実機確認が成功。以後の機能追加はXubuntuで進め、追加機能のSurface/Cage確認は別途行う。
+- 2026-10-14にXubuntuのFirefox画面でP3の電池・ネットワーク・音量表示を確認。電池のない開発機では「バッテリーが見つかりません。」と表示された。
+- 2026-10-14、Wi-Fiの接続先候補表示とパスワード入力の優先度を下げ、拡張を再起動後も利用するための導入方法の検討を先行する方針に変更。
+- Fedora Cageで`web-ext run`を起動コマンドに組み込んだ際、Firefoxが起動しないとの報告があった。原因は未確認のため自動読み込みは採用しない。元のFirefox起動引数で`about:debugging`を開く方式に戻し、2026-10-14にCageで起動を確認した。拡張は毎回手動で一時読み込みする。
+- 開発時のCageログアウトを先行実装する。Firefoxウィンドウだけを閉じてもCage画面が黒く残るため、Hostの固定アクション`cage_logout`から`loginctl --no-ask-password terminate-session ""`で呼び出し元のログインセッションを終了する。Cage起動スクリプトが渡す`FOXBOOK_CAGE_SESSION=1`を実行条件とし、画面で確認してから送る。SSHは別セッションとして維持し、終了動作は実機で確認する。
+- Host登録後の更新は制御ページの確認付き`update_host`アクションから行う。インストーラーは更新元インストーラーと検査対象Firefoxのパスをユーザー領域に記録し、Hostはその固定記録からインストーラーを再実行する。初回登録と既存Hostへの機能導入は端末から行い、更新元リポジトリがない場合はエラーを表示する。
 - 将来のSnap／Flatpak版FirefoxとNative Messagingの連携方法。
 - 将来のFoxbookホーム画面から制御ページを安全に開く経路。
 - 失敗コードごとの具体的なユーザー向けメッセージ。
