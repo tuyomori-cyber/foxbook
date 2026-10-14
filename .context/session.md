@@ -1,12 +1,13 @@
 # Current State
 
-Updated: 1791970861
+Updated: 1791971219
 
 Now:
-- Pending: FedoraのFirefox起動時にFOXBOOK_CAGE_SESSION=1を渡し、Cageログアウトを実機確認する。
+- Done: Fedora Cageのログアウトボタンからセッション終了に成功。READMEと仕様書に反映。
+- Pending: FedoraでHost更新ボタンとP3状態取得を実機確認。
 
 Next:
-- 起動スクリプトを確認してCageからFirefoxを起動し直す。
+- FedoraでHost更新ボタンと電池・ネットワーク・音量表示を確認。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
