@@ -60,6 +60,37 @@ class NativeHostTests(unittest.TestCase):
 
                 self.assertEqual(host.process_request({"action": action}, runner)["output"], "status\n")
 
+    def test_set_volume_uses_fixed_sink_and_percent(self):
+        def runner(command, **kwargs):
+            self.assertEqual(command, ["/usr/bin/wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", "54%"])
+            self.assertEqual(kwargs["timeout"], host.COMMAND_TIMEOUT_SECONDS)
+            self.assertFalse(kwargs["check"])
+            return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+        self.assertEqual(
+            host.process_request({"action": "set_volume", "volume": 54}, runner),
+            {"success": True, "output": "", "error": None},
+        )
+
+    def test_set_volume_rejects_invalid_values_without_running_command(self):
+        def forbidden_runner(*args, **kwargs):
+            raise AssertionError("invalid volume must not run a command")
+
+        invalid_requests = [
+            {"action": "set_volume"},
+            {"action": "set_volume", "volume": -1},
+            {"action": "set_volume", "volume": 101},
+            {"action": "set_volume", "volume": 55.0},
+            {"action": "set_volume", "volume": True},
+            {"action": "set_volume", "volume": "55%"},
+            {"action": "set_volume", "volume": 55, "command": "id"},
+        ]
+        for request in invalid_requests:
+            with self.subTest(request=request):
+                self.assertEqual(
+                    host.process_request(request, forbidden_runner)["error"]["code"], "INVALID_REQUEST"
+                )
+
     def test_battery_status_reads_only_battery_supplies(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

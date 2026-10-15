@@ -1,6 +1,6 @@
 # Foxbook Control v0.1
 
-Firefoxの拡張ページから、ユーザー権限のNative Messaging Hostに固定アクションを送ります。`system_info`に加え、P3の読み取り専用操作として電池（`/sys/class/power_supply`）、ネットワーク（`nmcli device status`）、音量（`wpctl get-volume`）を表示できます。電池がない端末ではその旨を表示します。ネットワーク表示にはNetworkManager、音量表示にはWirePlumberの`wpctl`が必要です。Cage用のログアウトボタンは確認後に呼び出し元のログインセッションを終了します。
+Firefoxの拡張ページから、ユーザー権限のNative Messaging Hostに固定アクションを送ります。`system_info`に加え、電池（`/sys/class/power_supply`）、ネットワーク（`nmcli device status`）、音量（`wpctl get-volume`）を表示できます。音量は0〜100%のスライダーで調整でき、スライダーを離した時に`wpctl set-volume`を1回実行します。電池がない端末ではその旨を表示します。ネットワーク表示にはNetworkManager、音量表示・変更にはWirePlumberの`wpctl`が必要です。Cage用のログアウトボタンは確認後に呼び出し元のログインセッションを終了します。
 
 ## Xubuntu 24.04での検証
 
@@ -44,6 +44,8 @@ exec firefox --no-remote --new-instance about:debugging
 ```
 
 ログアウト機能を使う場合は同じスクリプトでFirefox起動行の直前に`export FOXBOOK_CAGE_SESSION=1`を追加します。この印がない環境ではHostがログアウト操作を拒否します。Fedoraでも初回と更新ボタン導入時は上記のインストーラーを端末で実行し、その後は制御ページからHostを更新できます。更新元リポジトリはFedora上にも必要です。
+
+音量スライダーの追加後に`INVALID_REQUEST`が出る場合は、Surface上で`cd "$HOME/foxbook-control" && git pull`を実行し、制御ページの「Hostを更新」を押してください。初回登録が済んでいれば、端末からインストーラーを再実行する必要はありません。拡張も変更されているため、`about:debugging`で再読み込みしてから制御ページを開き直します。更新元の記録がない場合だけ、上記のインストーラーを再実行してください。
 
 Hostの`cage_logout`は固定コマンド`loginctl --no-ask-password terminate-session ""`を実行します。空文字のIDはコマンドを呼び出したログインセッションを指すため、Cageから呼んだ場合はCageのセッションを終了し、別のSSHセッションは対象にしません。2026-10-14にFedora Cageでログアウト成功を確認しました。[systemdのloginctlマニュアル](https://www.freedesktop.org/software/systemd/man/latest/loginctl.html)
 

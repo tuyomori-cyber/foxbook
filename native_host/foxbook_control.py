@@ -70,11 +70,17 @@ def process_request(
     request: Any, run_command: Callable[..., Any] = subprocess.run, battery_root: Path = BATTERY_ROOT,
     environment: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
-    if not isinstance(request, dict) or set(request) != {"action"} or not isinstance(request["action"], str):
+    if not isinstance(request, dict) or not isinstance(request.get("action"), str):
         return response(False, code="INVALID_REQUEST", message="要求の形式が正しくありません。")
 
     action = request["action"]
-    if action not in COMMANDS and action not in ("battery_status", "update_host"):
+    if action == "set_volume":
+        if (set(request) != {"action", "volume"} or type(request["volume"]) is not int
+                or not 0 <= request["volume"] <= 100):
+            return response(False, code="INVALID_REQUEST", message="音量は0から100の整数で指定してください。")
+    elif set(request) != {"action"}:
+        return response(False, code="INVALID_REQUEST", message="要求の形式が正しくありません。")
+    if action not in COMMANDS and action not in ("battery_status", "update_host", "set_volume"):
         return response(False, code="UNKNOWN_ACTION", message="未登録の操作です。")
     if action == "cage_logout" and (environment if environment is not None else os.environ).get("FOXBOOK_CAGE_SESSION") != "1":
         return response(False, code="PERMISSION_DENIED", message="Cageセッションからのみログアウトできます。")
@@ -88,6 +94,8 @@ def process_request(
             except (OSError, ValueError) as exc:
                 LOGGER.warning("host update source unavailable: %s", exc)
                 return response(False, code="COMMAND_FAILED", message="更新元が見つかりません。端末からインストーラーを再実行してください。")
+        elif action == "set_volume":
+            command = ["/usr/bin/wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", f"{request['volume']}%"]
         else:
             command = list(COMMANDS[action])
         result = run_command(
