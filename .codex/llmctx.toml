@@ -1,3 +1,3 @@
-context = "foxbook-control"
+context = "foxbook"
 repo = "foxbook-control"
-context_dir = "/home/tuyomori/project/foxbook-control/.context"
+context_dir = "/home/tuyomori/project/foxbook/foxbook-control/.context"

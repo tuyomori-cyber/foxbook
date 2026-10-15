@@ -4,11 +4,10 @@
 			"path": "."
 		},
 		{
-			"path": "../THE-SESSION-TOOLS"
+			"path": "../Firefox-On-Screen-Keyboard"
 		},
 		{
-			"path": "../Firefox-On-Screen-Keyboard"
+			"path": "../THE-SESSION-TOOLS"
 		}
-	],
-	"settings": {}
+	]
 }
