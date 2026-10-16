@@ -16,6 +16,7 @@ from typing import Any, Callable, Mapping
 MAX_REQUEST_BYTES = 65536
 COMMAND_TIMEOUT_SECONDS = 5
 UPDATE_TIMEOUT_SECONDS = 30
+SYNC_TIMEOUT_SECONDS = 900
 LOGGER = logging.getLogger("foxbook_control")
 COMMANDS = {
     "system_info": ("/usr/bin/uname", "-a"),
@@ -25,6 +26,7 @@ COMMANDS = {
 }
 BATTERY_ROOT = Path("/sys/class/power_supply")
 INSTALL_SOURCE_PATH = Path(__file__).resolve().with_name("install_source.json")
+SCORE_SYNC_SCRIPT = Path.home() / "bin" / "sync-score.sh"
 
 
 def response(success: bool, output: str = "", code: str | None = None, message: str = "") -> dict[str, Any]:
@@ -66,6 +68,14 @@ def update_command(source_path: Path = INSTALL_SOURCE_PATH) -> list[str]:
     return [sys.executable, installer, "--firefox", firefox]
 
 
+def score_sync_command(script: Path = SCORE_SYNC_SCRIPT) -> list[str]:
+    if not script.is_file():
+        raise FileNotFoundError(script)
+    if not os.access(script, os.X_OK):
+        raise PermissionError(13, "script is not executable", str(script))
+    return [str(script)]
+
+
 def process_request(
     request: Any, run_command: Callable[..., Any] = subprocess.run, battery_root: Path = BATTERY_ROOT,
     environment: Mapping[str, str] | None = None,
@@ -80,7 +90,7 @@ def process_request(
             return response(False, code="INVALID_REQUEST", message="音量は0から100の整数で指定してください。")
     elif set(request) != {"action"}:
         return response(False, code="INVALID_REQUEST", message="要求の形式が正しくありません。")
-    if action not in COMMANDS and action not in ("battery_status", "update_host", "set_volume"):
+    if action not in COMMANDS and action not in ("battery_status", "update_host", "set_volume", "sync_score"):
         return response(False, code="UNKNOWN_ACTION", message="未登録の操作です。")
     if action == "cage_logout" and (environment if environment is not None else os.environ).get("FOXBOOK_CAGE_SESSION") != "1":
         return response(False, code="PERMISSION_DENIED", message="Cageセッションからのみログアウトできます。")
@@ -94,18 +104,26 @@ def process_request(
             except (OSError, ValueError) as exc:
                 LOGGER.warning("host update source unavailable: %s", exc)
                 return response(False, code="COMMAND_FAILED", message="更新元が見つかりません。端末からインストーラーを再実行してください。")
+        elif action == "sync_score":
+            try:
+                command = score_sync_command()
+            except FileNotFoundError:
+                return response(False, code="COMMAND_FAILED", message="~/bin/sync-score.sh が見つかりません。")
         elif action == "set_volume":
             command = ["/usr/bin/wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", f"{request['volume']}%"]
         else:
             command = list(COMMANDS[action])
         result = run_command(
             command, capture_output=True, text=True,
-            timeout=UPDATE_TIMEOUT_SECONDS if action == "update_host" else COMMAND_TIMEOUT_SECONDS, check=False
+            timeout=(SYNC_TIMEOUT_SECONDS if action == "sync_score" else
+                     UPDATE_TIMEOUT_SECONDS if action == "update_host" else COMMAND_TIMEOUT_SECONDS),
+            check=False,
         )
     except subprocess.TimeoutExpired:
         LOGGER.warning(
             "command timeout: action=%s seconds=%s", action,
-            UPDATE_TIMEOUT_SECONDS if action == "update_host" else COMMAND_TIMEOUT_SECONDS,
+            (SYNC_TIMEOUT_SECONDS if action == "sync_score" else
+             UPDATE_TIMEOUT_SECONDS if action == "update_host" else COMMAND_TIMEOUT_SECONDS),
         )
         return response(False, code="TIMEOUT", message="操作が時間内に完了しませんでした。")
     except PermissionError as exc:
@@ -123,7 +141,7 @@ def process_request(
             "command failed: action=%s returncode=%s stderr=%r",
             request["action"], result.returncode, result.stderr[:4096],
         )
-        return response(False, code="COMMAND_FAILED", message="操作を完了できませんでした。")
+        return response(False, code="COMMAND_FAILED", message="楽譜の同期に失敗しました。" if action == "sync_score" else "操作を完了できませんでした。")
     return response(True, output=result.stdout)
 
 

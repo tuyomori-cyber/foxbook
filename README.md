@@ -2,6 +2,8 @@
 
 Firefoxの拡張ページから、ユーザー権限のNative Messaging Hostに固定アクションを送ります。`system_info`に加え、電池（`/sys/class/power_supply`）、ネットワーク（`nmcli device status`）、音量（`wpctl get-volume`）を表示できます。音量は0〜100%のスライダーで調整でき、スライダーを離した時に`wpctl set-volume`を1回実行します。電池がない端末ではその旨を表示します。ネットワーク表示にはNetworkManager、音量表示・変更にはWirePlumberの`wpctl`が必要です。Cage用のログアウトボタンは確認後に呼び出し元のログインセッションを終了します。
 
+「Dropboxから楽譜を同期」は、Hostを実行しているユーザーの`~/bin/sync-score.sh`だけを起動します。スクリプトに実行権限が必要です。同期中はボタンを無効にし、完了または失敗を画面に表示します。同期の待機上限は15分です。
+
 ## Xubuntu 24.04での検証
 
 1. [Mozilla公式のLinux版Firefox](https://support.mozilla.org/ja/kb/install-firefox-linux)を取得し、配布物のディレクトリ構造を保って`~/.local/opt/foxbook-firefox/`に配置します。`~/.local/opt/foxbook-firefox/firefox`が実行ファイルとなるようにします。既存のSnap版には触れません。
@@ -46,6 +48,23 @@ exec firefox --no-remote --new-instance about:debugging
 ログアウト機能を使う場合は同じスクリプトでFirefox起動行の直前に`export FOXBOOK_CAGE_SESSION=1`を追加します。この印がない環境ではHostがログアウト操作を拒否します。Fedoraでも初回と更新ボタン導入時は上記のインストーラーを端末で実行し、その後は制御ページからHostを更新できます。更新元リポジトリはFedora上にも必要です。
 
 音量スライダーの追加後に`INVALID_REQUEST`が出る場合は、Surface上で`cd "$HOME/foxbook-control" && git pull`を実行し、制御ページの「Hostを更新」を押してください。初回登録が済んでいれば、端末からインストーラーを再実行する必要はありません。拡張も変更されているため、`about:debugging`で再読み込みしてから制御ページを開き直します。更新元の記録がない場合だけ、上記のインストーラーを再実行してください。
+
+楽譜同期ボタンをSurfaceに反映する場合も、Surfaceでリポジトリを更新し、「Hostを更新」を押してから`about:debugging`で拡張を再読み込みします。`UNKNOWN_ACTION`と表示される場合は、SurfaceのHostがまだ古い状態です。`~/bin/sync-score.sh`がない場合や実行権限がない場合も画面にエラーを表示します。
+
+現在の`sync-score.sh`は`rclone sync`が失敗しても、後続の`notify-send`が成功すると終了コード0を返します。画面に正しい同期結果を表示するため、Surface上のスクリプトの`if`部分を次の形にしてください。通知できない環境でも同期の成否は正しく返します。
+
+```bash
+if rclone sync dropbox:score "$HOME/score" \
+  --include '**/*.pdf' \
+  --include '*.pdf'
+then
+    notify-send "Score Sync" "楽譜PDFの同期が完了しました" || true
+    exit 0
+else
+    notify-send -u critical "Score Sync" "楽譜PDFの同期に失敗しました" || true
+    exit 1
+fi
+```
 
 Hostの`cage_logout`は固定コマンド`loginctl --no-ask-password terminate-session ""`を実行します。空文字のIDはコマンドを呼び出したログインセッションを指すため、Cageから呼んだ場合はCageのセッションを終了し、別のSSHセッションは対象にしません。2026-10-14にFedora Cageでログアウト成功を確認しました。[systemdのloginctlマニュアル](https://www.freedesktop.org/software/systemd/man/latest/loginctl.html)
 

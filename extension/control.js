@@ -3,6 +3,7 @@
 const HOST_NAME = "foxbook_control";
 const RESPONSE_TIMEOUT_MS = 10_000;
 const UPDATE_TIMEOUT_MS = 40_000;
+const SYNC_TIMEOUT_MS = 910_000;
 const buttons = [...document.querySelectorAll("button[data-action]")];
 const logoutButton = document.getElementById("cage-logout");
 const status = document.getElementById("status");
@@ -38,16 +39,17 @@ function readVolume(text) {
 
 function requestStatus(action, request = { action }) {
   const isUpdate = action === "update_host";
+  const isSync = action === "sync_score";
   if (isUpdate && !window.confirm("更新元のリポジトリからNative Hostを再インストールします。続けますか？")) return;
   const requestId = ++currentRequest;
   const label = action === "set_volume" ? "音量" : buttons.find((button) => button.dataset.action === action).textContent.trim();
   buttons.forEach((button) => { button.disabled = true; });
   volumeSlider.disabled = true;
-  showResult(isUpdate ? "Native Hostを更新中…" : action === "set_volume" ? "音量を変更中…" : `${label}を取得中…`);
+  showResult(isUpdate ? "Native Hostを更新中…" : isSync ? "Dropboxから楽譜を同期中…" : action === "set_volume" ? "音量を変更中…" : `${label}を取得中…`);
 
   let timer;
   const timeout = new Promise((_, reject) => {
-    timer = setTimeout(() => reject(new Error("応答待機が時間内に完了しませんでした")), isUpdate ? UPDATE_TIMEOUT_MS : RESPONSE_TIMEOUT_MS);
+    timer = setTimeout(() => reject(new Error("応答待機が時間内に完了しませんでした")), isSync ? SYNC_TIMEOUT_MS : isUpdate ? UPDATE_TIMEOUT_MS : RESPONSE_TIMEOUT_MS);
   });
 
   return Promise.race([
@@ -65,7 +67,7 @@ function requestStatus(action, request = { action }) {
         showVolume(confirmedVolume);
         showResult("音量を変更しました。", `${confirmedVolume}%`);
       } else {
-        showResult(isUpdate ? "Native Hostを更新しました。" : `${label}を取得しました。`, response.output);
+        showResult(isUpdate ? "Native Hostを更新しました。" : isSync ? "楽譜の同期が完了しました。" : `${label}を取得しました。`, response.output);
       }
     } else if (!response.success && response.error && typeof response.error.code === "string" && typeof response.error.message === "string") {
       const message = action === "set_volume" && response.error.code === "INVALID_REQUEST"

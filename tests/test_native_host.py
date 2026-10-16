@@ -161,6 +161,33 @@ class NativeHostTests(unittest.TestCase):
             result = host.process_request({"action": "update_host"}, forbidden_runner)
         self.assertEqual(result["error"]["code"], "COMMAND_FAILED")
 
+    def test_score_sync_runs_only_home_script_and_reports_failure(self):
+        with tempfile.TemporaryDirectory() as directory:
+            script = Path(directory) / "sync-score.sh"
+            script.write_text("#!/bin/bash\n")
+            script.chmod(0o700)
+
+            def runner(command, **kwargs):
+                self.assertEqual(command, [str(script)])
+                self.assertEqual(kwargs["timeout"], host.SYNC_TIMEOUT_SECONDS)
+                self.assertFalse(kwargs["check"])
+                return subprocess.CompletedProcess(command, 1, stdout="", stderr="sync failed")
+
+            with mock.patch.object(host, "score_sync_command", return_value=host.score_sync_command(script)):
+                result = host.process_request({"action": "sync_score"}, runner)
+            self.assertEqual(result["error"]["code"], "COMMAND_FAILED")
+            self.assertEqual(result["error"]["message"], "楽譜の同期に失敗しました。")
+
+    def test_score_sync_missing_script_never_runs_command(self):
+        with tempfile.TemporaryDirectory() as directory:
+            def forbidden_runner(*args, **kwargs):
+                raise AssertionError("missing script must not run")
+
+            with mock.patch.object(host, "score_sync_command", side_effect=FileNotFoundError()):
+                result = host.process_request({"action": "sync_score"}, forbidden_runner)
+            self.assertEqual(result["error"]["code"], "COMMAND_FAILED")
+            self.assertIn("sync-score.sh", result["error"]["message"])
+
     def test_extra_fields_are_rejected_without_running_command(self):
         def forbidden_runner(*args, **kwargs):
             raise AssertionError("OS command must not run")
