@@ -4,6 +4,10 @@ Firefoxの拡張ページから、ユーザー権限のNative Messaging Hostに�
 
 「Dropboxから楽譜を同期」は、Hostを実行しているユーザーの`~/bin/sync-score.sh`だけを起動します。スクリプトに実行権限が必要です。同期中はボタンを無効にし、完了または失敗を画面に表示します。同期の待機上限は15分です。
 
+輝度も音量と同じく、画面を開いたときに現在値を取得し、スライダーを離したときに1回変更します。調整範囲は1〜100%です。「輝度」ボタンで現在値を再取得できます。Hostは`brightness_status`で`/usr/bin/brightnessctl --machine-readable --class=backlight info`、`set_brightness`で同じオプションの`set 整数%`を実行し、変更後の実際の値を表示します。LEDは対象にせず、最初に見つかるバックライトを使用します。
+
+輝度の取得・変更には[`brightnessctl`](https://github.com/Hummer12007/brightnessctl)とバックライト対応デバイスが必要です。Fedoraは`sudo dnf install brightnessctl`、Xubuntuは`sudo apt install brightnessctl`で導入できます。実行ユーザーにバックライト変更権限が必要です。Hostから権限昇格は行いません。Surfaceへの反映はリポジトリを更新し、「Hostを更新」を押してから、`about:debugging`で拡張を再読み込みし、制御ページを開き直してください。取得できない場合、輝度スライダーは無効のままエラーを表示します。Surface/Cageでの実機確認は未実施です。
+
 ## Xubuntu 24.04での検証
 
 1. [Mozilla公式のLinux版Firefox](https://support.mozilla.org/ja/kb/install-firefox-linux)を取得し、配布物のディレクトリ構造を保って`~/.local/opt/foxbook-firefox/`に配置します。`~/.local/opt/foxbook-firefox/firefox`が実行ファイルとなるようにします。既存のSnap版には触れません。
@@ -73,6 +77,7 @@ Hostの`cage_logout`は固定コマンド`loginctl --no-ask-password terminate-s
 
 ```sh
 python3 -m unittest discover -s tests -v
+node --test tests/test_control.cjs
 ```
 
 テストはモックを使い、システム操作を実行しません。

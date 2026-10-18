@@ -1,13 +1,13 @@
 # Current State
 
-Updated: 1792021203
+Updated: 1792322637
 
 Now:
-- Done: Fedora Cageのログアウトボタンからセッション終了に成功。READMEと仕様書に反映。
-- Pending: FedoraでHost更新ボタンとP3状態取得を実機確認。
+- Done: llmctxの参照・更新先を作業リポジトリ内の.contextへ統一し、dry-runで検証済み。
+- Done: 既存履歴を保持し、誤った保存先の会話3件・処理待ちデータを引き継ぎ、ToDoを補完。
 
 Next:
-- FedoraでHost更新ボタンと電池・ネットワーク・音量表示を確認。
+- Surface/Cageでの実機確認とFX OSKの未完了作業を継続する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -15,9 +15,9 @@ Constraints:
 
 Relevant:
 - context: foxbook
-- context: foxbook-control
 - repo: Firefox-On-Screen-Keyboard
 - repo: THE-SESSION-TOOLS
-- repo: foxbook
 - repo: foxbook-control
+- cwd: /home/tuyomori/project/foxbook-control
+- file: .context/session.md
 

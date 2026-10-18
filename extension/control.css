@@ -27,28 +27,33 @@ button {
   gap: 0.75rem;
 }
 
-.volume-control {
+.volume-control,
+.brightness-control {
   max-width: 32rem;
   margin-top: 1.5rem;
 }
 
-.volume-heading {
+.volume-heading,
+.brightness-heading {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-#volume-value {
+#volume-value,
+#brightness-value {
   font-variant-numeric: tabular-nums;
 }
 
-#volume-slider {
+#volume-slider,
+#brightness-slider {
   width: 100%;
   min-height: 3rem;
   margin: 0;
 }
 
-.volume-control p {
+.volume-control p,
+.brightness-control p {
   margin: 0;
   font-size: 0.875rem;
 }

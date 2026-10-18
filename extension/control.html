@@ -16,6 +16,7 @@
       <button data-action="battery_status" type="button">電池</button>
       <button data-action="network_status" type="button">ネットワーク</button>
       <button data-action="audio_status" type="button">音量</button>
+      <button data-action="brightness_status" type="button">輝度</button>
     </div>
     <div class="volume-control">
       <div class="volume-heading">
@@ -23,6 +24,14 @@
         <output id="volume-value" for="volume-slider">--%</output>
       </div>
       <input id="volume-slider" type="range" min="0" max="100" step="1" value="0" disabled>
+      <p>スライダーを離すと設定します。</p>
+    </div>
+    <div class="brightness-control">
+      <div class="brightness-heading">
+        <label for="brightness-slider">輝度を調整</label>
+        <output id="brightness-value" for="brightness-slider">--%</output>
+      </div>
+      <input id="brightness-slider" type="range" min="1" max="100" step="1" value="1" disabled>
       <p>スライダーを離すと設定します。</p>
     </div>
     <section aria-labelledby="score-title">

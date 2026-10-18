@@ -50,6 +50,7 @@ class NativeHostTests(unittest.TestCase):
         expected = {
             "network_status": ["/usr/bin/nmcli", "-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "device", "status"],
             "audio_status": ["/usr/bin/wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"],
+            "brightness_status": ["/usr/bin/brightnessctl", "--machine-readable", "--class=backlight", "info"],
         }
         for action, command in expected.items():
             with self.subTest(action=action):
@@ -90,6 +91,44 @@ class NativeHostTests(unittest.TestCase):
                 self.assertEqual(
                     host.process_request(request, forbidden_runner)["error"]["code"], "INVALID_REQUEST"
                 )
+
+    def test_set_brightness_uses_only_backlight_and_integer_percent(self):
+        for brightness in (1, 54, 100):
+            with self.subTest(brightness=brightness):
+                def runner(command, **kwargs):
+                    self.assertEqual(command, ["/usr/bin/brightnessctl", "--machine-readable", "--class=backlight", "set", f"{brightness}%"])
+                    self.assertEqual(kwargs["timeout"], host.COMMAND_TIMEOUT_SECONDS)
+                    self.assertFalse(kwargs["check"])
+                    return subprocess.CompletedProcess(command, 0, stdout=f"intel_backlight,backlight,{brightness},{brightness}%,100\n", stderr="")
+
+                result = host.process_request({"action": "set_brightness", "brightness": brightness}, runner)
+                self.assertTrue(result["success"])
+                self.assertIn(f",{brightness}%,", result["output"])
+
+    def test_set_brightness_rejects_invalid_requests_without_command(self):
+        runner = mock.Mock(side_effect=AssertionError("invalid brightness must not run a command"))
+        invalid = [{"action": "set_brightness"}]
+        invalid.extend({"action": "set_brightness", "brightness": value}
+                       for value in (None, 0, -1, 101, 54.0, True, "54%", "50%; id"))
+        invalid.append({"action": "set_brightness", "brightness": 54, "device": "other"})
+        for request in invalid:
+            with self.subTest(request=request):
+                self.assertEqual(host.process_request(request, runner)["error"]["code"], "INVALID_REQUEST")
+        runner.assert_not_called()
+
+    def test_brightness_command_errors(self):
+        for action in ("brightness_status", "set_brightness"):
+            request = {"action": action}
+            if action == "set_brightness":
+                request["brightness"] = 54
+            for exception, code in ((FileNotFoundError(), "COMMAND_FAILED"),
+                                    (PermissionError(), "PERMISSION_DENIED"),
+                                    (subprocess.TimeoutExpired("brightnessctl", 5), "TIMEOUT")):
+                with self.subTest(action=action, exception=exception):
+                    result = host.process_request(request, mock.Mock(side_effect=exception))
+                    self.assertEqual(result["error"]["code"], code)
+                    if isinstance(exception, FileNotFoundError):
+                        self.assertIn("brightnessctl", result["error"]["message"])
 
     def test_battery_status_reads_only_battery_supplies(self):
         with tempfile.TemporaryDirectory() as directory:

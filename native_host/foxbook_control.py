@@ -22,6 +22,7 @@ COMMANDS = {
     "system_info": ("/usr/bin/uname", "-a"),
     "network_status": ("/usr/bin/nmcli", "-t", "-f", "DEVICE,TYPE,STATE,CONNECTION", "device", "status"),
     "audio_status": ("/usr/bin/wpctl", "get-volume", "@DEFAULT_AUDIO_SINK@"),
+    "brightness_status": ("/usr/bin/brightnessctl", "--machine-readable", "--class=backlight", "info"),
     "cage_logout": ("/usr/bin/loginctl", "--no-ask-password", "terminate-session", ""),
 }
 BATTERY_ROOT = Path("/sys/class/power_supply")
@@ -84,13 +85,14 @@ def process_request(
         return response(False, code="INVALID_REQUEST", message="要求の形式が正しくありません。")
 
     action = request["action"]
-    if action == "set_volume":
-        if (set(request) != {"action", "volume"} or type(request["volume"]) is not int
-                or not 0 <= request["volume"] <= 100):
-            return response(False, code="INVALID_REQUEST", message="音量は0から100の整数で指定してください。")
+    if action in ("set_volume", "set_brightness"):
+        field, label, minimum = ("volume", "音量", 0) if action == "set_volume" else ("brightness", "輝度", 1)
+        if (set(request) != {"action", field} or type(request[field]) is not int
+                or not minimum <= request[field] <= 100):
+            return response(False, code="INVALID_REQUEST", message=f"{label}は{minimum}から100の整数で指定してください。")
     elif set(request) != {"action"}:
         return response(False, code="INVALID_REQUEST", message="要求の形式が正しくありません。")
-    if action not in COMMANDS and action not in ("battery_status", "update_host", "set_volume", "sync_score"):
+    if action not in COMMANDS and action not in ("battery_status", "update_host", "set_volume", "set_brightness", "sync_score"):
         return response(False, code="UNKNOWN_ACTION", message="未登録の操作です。")
     if action == "cage_logout" and (environment if environment is not None else os.environ).get("FOXBOOK_CAGE_SESSION") != "1":
         return response(False, code="PERMISSION_DENIED", message="Cageセッションからのみログアウトできます。")
@@ -111,6 +113,8 @@ def process_request(
                 return response(False, code="COMMAND_FAILED", message="~/bin/sync-score.sh が見つかりません。")
         elif action == "set_volume":
             command = ["/usr/bin/wpctl", "set-volume", "@DEFAULT_AUDIO_SINK@", f"{request['volume']}%"]
+        elif action == "set_brightness":
+            command = ["/usr/bin/brightnessctl", "--machine-readable", "--class=backlight", "set", f"{request['brightness']}%"]
         else:
             command = list(COMMANDS[action])
         result = run_command(
@@ -129,6 +133,10 @@ def process_request(
     except PermissionError as exc:
         LOGGER.warning("permission denied: action=%s errno=%s", request["action"], exc.errno)
         return response(False, code="PERMISSION_DENIED", message="この操作を実行する権限がありません。")
+    except FileNotFoundError as exc:
+        LOGGER.error("command not found: action=%s errno=%s", action, exc.errno)
+        message = "brightnessctlが見つかりません。インストールしてください。" if action in ("brightness_status", "set_brightness") else "操作を完了できませんでした。"
+        return response(False, code="COMMAND_FAILED", message=message)
     except OSError as exc:
         LOGGER.error("command start failed: action=%s errno=%s", request["action"], exc.errno)
         return response(False, code="COMMAND_FAILED", message="操作を完了できませんでした。")

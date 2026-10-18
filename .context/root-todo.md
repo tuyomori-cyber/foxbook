@@ -39,24 +39,24 @@
 - `error.code`は機械判定用、`error.message`はユーザー向けとし、終了コード・エラー出力などの調査情報は秘密情報を除いて標準エラーログに残せる設計とする
 - 制御ページでは`error.message`を主に、`error.code`を小さく併記し、コマンドのエラー出力やトレースバックは表示しない
 - MVPの`system_info`コマンド実行上限は5秒。超過時はコマンドを終了し、Hostが`TIMEOUT`を返す
-- 拡張側のHost応答待機上限は10秒。超過時は待機表示を終え、`HOST_UNAVAILABLE`を表示する。遅延応答は反映しない
+- 拡張側の通常操作のHost応答待機上限は10秒（Host更新は40秒、楽譜同期は910秒）。超過時は待機表示を終え、`HOST_UNAVAILABLE`を表示する。遅延応答は反映しない
 - Host本体は各端末の`~/.local/share/foxbook-control/`へ配置し、MVPのインストールスクリプトで実行権限とHost定義を設定する
 - Host定義の`path`はインストール先の絶対パスから生成し、XubuntuとFedoraで同じインストール手順を使う
 - MVPはサンドボックス外のMozilla公式Linuxバイナリまたはネイティブパッケージ版Firefoxを対象とし、Snap／Flatpak版は対象外とする
 - 共通インストーラーは`--firefox /絶対パス/firefox`を必須とし、存在・実行権限・実体・導入形態を検査する。Snap／Flatpak版と判定不能なものは変更前にエラー終了する
 - `--firefox`は検査対象の指定であり、ユーザー単位のHost登録をそのFirefox専用にするものではない。事前検査がすべて成功してからインストールを始める
-- インストーラーは再実行可能とし、Host本体と定義のみ更新する。Firefox本体・各プロファイルは変更せず、一時ファイルを検証してから置き換え、途中失敗時の復旧と後片付けを行う
+- インストーラーは再実行可能とし、Host本体・定義・更新元情報（install_source.json）を更新する。Firefox本体・各プロファイルは変更せず、一時ファイルを検証してから置き換え、途中失敗時の復旧と後片付けを行う
 - XubuntuではMozilla公式配布物の構造を維持して`~/.local/opt/foxbook-firefox/`に配置し、専用プロファイル`~/.local/share/foxbook-control/firefox-profile/`で起動する。Snap版とそのプロファイルは変更しない。FedoraではRPM版Firefoxを使う
 - MVPにはXubuntu専用のFirefox起動スクリプトを含め、公式バイナリの絶対パス、`-profile`、`--no-remote`を指定する。Fedoraでは使用しない
 - MVP開発中の拡張は検証専用プロファイルの`about:debugging`から一時読み込みし、Firefox再起動後は再読み込みする
 - FedoraのFirefoxはRPM版`firefox-157.0-1.fc43.x86_64`と確認済み。MVPのHost通信はKDE PlasmaとCageで確認済み
 - XubuntuではMVPに加え、P3の電池・ネットワーク・音量表示を確認済み
-- P3の実装とローカル単体テスト16件は完了済み。Fedora実機での「Hostを更新」ボタンとP3の電池・ネットワーク・音量表示の確認が残っている
+- P3の実装は完了済み。最新のローカル検証はPython単体テスト23件・UIテスト5件成功。Fedora実機での「Hostを更新」ボタンとP3の電池・ネットワーク・音量表示の確認が残っている
 - Foxbookの主な利用目的は楽譜閲覧。ローカルPDFはFirefoxのファイルメニューから開き、The Session（`thesession.org`）では楽曲検索を行う
 - Surface実機のCageとFirefoxでは検索文字列を入力する手段が不足しているため、仮想キーボードなどの入力手段を検討する
 - The Session専用のメトロノームは別リポジトリ`/home/tuyomori/project/THE-SESSION-TOOLS/`で実装済み
 - The Session以外にGoogle検索などのWeb検索でも入力が必要になるため、仮想キーボードをTHE SESSION TOOLSに同居させる方針は取り下げる
-- THE SESSION TOOLSはメトロノーム専用のままとする。仮想キーボードは既存のFX OSK（[Firefox-On-Screen-Keyboard](https://github.com/TravFitz/Firefox-On-Screen-Keyboard)）を候補とし、新リポジトリの作成は実機評価後に判断する
+- THE SESSION TOOLSはメトロノーム専用のままとする。仮想キーボードは既存のFX OSK（[Firefox-On-Screen-Keyboard](https://github.com/TravFitz/Firefox-On-Screen-Keyboard?utm_source=chatgpt.com)）を候補とし、新リポジトリの作成は実機評価後に判断する
 - Firefox拡張のページ内UIはWebページの入力欄を補助できるが、Firefoxのアドレスバーや「ファイルを開く」ダイアログへの入力には対応できない
 - Google検索はGoogleの入力欄、任意のURLへの移動は拡張ページ内の入力欄から新しいタブで開く方法で代替できるため、アドレスバーへの直接入力は必須ではない
 - URLを見て編集する操作やブラウザの検索候補・履歴候補を使う操作も、現時点ではFoxbookの必須要件ではない
@@ -74,6 +74,10 @@
 - 改造ブランチ`foxbook-touch`は作成済み。自分のGitHub Forkへのpushと追跡設定も完了し、`mine/foxbook-touch`を追跡する状態になっている。GitHub上のForkは`tuyomori-cyber/Firefox-On-Screen-Keyboard`。サイズ調整後の変更はcommit・pushする
 - Forkへのpushは自分のGitHubリポジトリを対象とし、元の作者のリポジトリへ直接pushしない。cloneの削除や作り直しは不要
 - 開発ワークスペースには`foxbook-control`、`THE-SESSION-TOOLS`、`Firefox-On-Screen-Keyboard`の3リポジトリを登録している。3リポジトリとも読み取り可能だが、書き込み権限はリポジトリごとに異なり、他の2リポジトリの編集には承認が必要な場合がある
+- `llmctx`の参照・更新先は作業リポジトリ`/home/tuyomori/project/foxbook-control`内の`.context`に統一済み。`.codex/llmctx.toml`の`context_dir`はリポジトリ相対の`.context`とする
+- `/home/tuyomori/project/foxbook/foxbook-control`はワークスペース整理途中の保存先であり、作業リポジトリ・今後の更新先として使用しない
+- 誤った保存先にあった完了済み会話3件と処理待ちデータは、作業リポジトリの`.context`へ引き継ぎ済み。元ファイルは保持する
+- `llmctx`のセッション読み込みと自動更新のdry-runで正しい保存先を確認済み。参照・更新先の修正は完了している
 
 ## MVP ゴール
 
@@ -107,7 +111,7 @@
 - 検証専用プロファイルの`about:debugging`から`extension/manifest.json`を手動で一時読み込み済み。拡張アクションからの新規タブ表示と`system_info`結果をスクリーンショットで確認済み
 - P3：電池・ネットワーク・音量の状態表示を実装済み。Xubuntuで表示を確認済み
 - FedoraではKDE PlasmaとCageでMVPのNative Host通信を確認済み。Cageのログアウトも成功済み
-- ローカル単体テスト16件成功済み
+- 最新のローカル検証はPython単体テスト23件・UIテスト5件成功済み
 - Fedora実機で「Hostを更新」ボタンとP3の電池・ネットワーク・音量表示を確認する
 - 楽譜閲覧に必要な入力手段を前倒しし、その後の状態取得・変更操作とSurface移植の優先順位を見直す
 - 仮想キーボードはOS側への導入や新規開発を前提とせず、既存のFX OSKを先に試す
@@ -121,6 +125,8 @@
 - Forkを利用する際は、既存のローカルcloneを削除せず、元の作者のリポジトリを`origin`として維持する。自分のForkを追加remote（例：`mine`）として登録し、`foxbook-touch`ブランチをpushする。ブランチのpushと追跡設定は完了済み
 - FX OSKが要件を満たせば新しいリポジトリを作らない。不足がある場合に設定変更、既存プロジェクトへの改善提案、別実装の順に検討する
 - 開発ワークスペースの3リポジトリは読み取り可能。`foxbook-control`以外のリポジトリへの変更は、必要な権限・承認を確認してから行う
+- `llmctx`の設定を修正し、参照・更新先を作業リポジトリ内の`.context`へ統一済み。セッション読み込みと自動更新のdry-runで正しい保存先を確認済み
+- 誤った保存先の会話履歴3件と処理待ちデータを作業リポジトリへ引き継ぎ済み。整理途中の`foxbook`フォルダ内のファイルは保持し、作業リポジトリとして使用しない
 
 ## 未解決論点
 
@@ -140,6 +146,23 @@
 - FX OSKで文字入力できることは確認済みだが、入力できなかった原因は未特定。The SessionとGoogle検索それぞれでの削除・検索実行は未確認
 - FX OSKの倍率設定を100にしてもSurface向けの拡大が不足することを確認済み。サイズ計算やキー寸法の調整でタッチ操作に十分な表示サイズを確保できるか
 - 高DPI環境で`devicePixelRatio`による縮小が表示サイズに与える影響。倍率設定だけで不十分なため、改造ブランチでサイズ計算やキー寸法を調整する
+- Surfaceの同期スクリプトで`rclone sync`の成否が終了コードへ正しく反映され、Foxbook Control側の同期結果表示と一致するか
+- 輝度取得・変更アクションがSurface/Cage環境で正常に動作するか。変更は実装済みだが未コミットで、実機確認も未実施
+- URL入力欄および必要な`about:`ページへの専用導線をFoxbook Controlへ実装する必要があるか。現時点では設計案であり未実装
+
+## 現在の実装・更新先（2026-10-18確認）
+
+- 作業リポジトリは `/home/tuyomori/project/foxbook-control`。`.codex/llmctx.toml` の `context_dir` はリポジトリ相対の `.context` とする
+- `/home/tuyomori/project/foxbook/foxbook-control` はワークスペース整理途中の保存先であり、作業リポジトリ・今後の更新先として使用しない
+- 音量変更スライダー（0〜100%）は実装・コミット済み
+- Dropbox楽譜同期ボタンと `sync_score` は実装・コミット済み。ユーザーの `~/bin/sync-score.sh` を実行する。Hostの実行上限は900秒
+- Surfaceの同期スクリプトは `rclone sync` の成否を終了コードへ反映する必要がある。修正例と反映手順はREADMEに記載済み。実機での修正・同期成功失敗の確認は未確認
+- 輝度取得・変更アクションとスライダー（1〜100%、brightnessctl使用）は実装済み・未コミット。Surface/Cageでの実機確認は未実施
+- Python単体テスト23件・UIテスト5件成功。旧記述のP2テスト9件は当時の検証記録
+- FX OSKのサイズ調整は未実施。`foxbook-touch` とローカルmasterの差分はなく、既存のサイズ調整ToDoを継続する
+- URL入力欄および必要なabout:ページへの専用導線は設計案であり、Foxbook Controlには未実装
+- `llmctx`の参照・更新先は作業リポジトリ内の`.context`へ統一済み。セッション読み込みと自動更新のdry-runで正しい保存先を確認済み
+- 誤った保存先の完了済み会話3件と処理待ちデータを、このリポジトリの `.context` へ引き継いだ。元ファイルは保持する
 
 ## 次の一手
 
