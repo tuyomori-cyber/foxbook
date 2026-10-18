@@ -5,3 +5,4 @@ __pycache__/
 !/.context/session.md
 !/.context/root-todo.md
 target/
+*.zip

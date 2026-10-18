@@ -56,7 +56,7 @@
 - Surface実機のCageとFirefoxでは検索文字列を入力する手段が不足しているため、仮想キーボードなどの入力手段を検討する
 - The Session専用のメトロノームは別リポジトリ`/home/tuyomori/project/THE-SESSION-TOOLS/`で実装済み
 - The Session以外にGoogle検索などのWeb検索でも入力が必要になるため、仮想キーボードをTHE SESSION TOOLSに同居させる方針は取り下げる
-- THE SESSION TOOLSはメトロノーム専用のままとする。仮想キーボードは既存のFX OSK（[Firefox-On-Screen-Keyboard](https://github.com/TravFitz/Firefox-On-Screen-Keyboard?utm_source=chatgpt.com)）を候補とし、新リポジトリの作成は実機評価後に判断する
+- THE SESSION TOOLSはメトロノーム専用のままとする。仮想キーボードは既存のFX OSK（[Firefox-On-Screen-Keyboard](https://github.com/TravFitz/Firefox-On-Screen-Keyboard)）を候補とし、新リポジトリの作成は実機評価後に判断する
 - Firefox拡張のページ内UIはWebページの入力欄を補助できるが、Firefoxのアドレスバーや「ファイルを開く」ダイアログへの入力には対応できない
 - Google検索はGoogleの入力欄、任意のURLへの移動は拡張ページ内の入力欄から新しいタブで開く方法で代替できるため、アドレスバーへの直接入力は必須ではない
 - URLを見て編集する操作やブラウザの検索候補・履歴候補を使う操作も、現時点ではFoxbookの必須要件ではない
@@ -68,6 +68,8 @@
 - FX OSKの公開ソースでは、削除はカーソル位置ではなく文字列の末尾を消す実装となっており、Enterによる送信もフォームの構造に依存する。実際の検索欄での挙動を確認する
 - AMO公開版とGitHubのmasterでは版数が異なり、コード差分は未確認。まずAMO公開版を評価し、必要が生じた場合にソースとの差分を確認する
 - FX OSKでの文字入力は確認済み。入力できなかった原因は未特定であり、The SessionとGoogle検索それぞれでの削除・検索実行は未確認
+- FX OSKのAMO検証では、ソース・ZIPとの照合により、必須宣言とIDの欠落、`innerHTML`使用3箇所、`.git`と別ZIPの混入を確認済み。これらの問題のうち、必須宣言・固定ID・`innerHTML`警告は修正済み。梱包スクリプトとREADMEを追加し、必要なファイルだけを含むアップロード用ZIPを作成・検査済み。AMOでの再検証は未実施
+- FX OSKの配布用ZIPは、必要なファイルだけを指定して作成する方針とする。`manifest.json`、`kb.js`、`keyboard.js`、`icon.svg`、`icon.png`、`options/`、`LICENSE`を対象とし、`.git`や別ZIPを含めない。manifestの必須宣言・固定IDと`innerHTML`警告の修正、梱包スクリプトの追加は完了済み。AMOでの再検証が残っている
 - FX OSKには画面上の倍率設定があり、初期値は90、設定上限は100。設定値は入力欄からフォーカスを外したときに保存され、表示中のWebページを再読み込みすると反映される
 - FX OSKのサイズ計算では設定値を`devicePixelRatio`で割っているため、高DPI環境では設定を100にしても表示サイズの拡大が限定的になる可能性がある。Surfaceで設定100を試した結果、Surface向けの拡大が不足することを確認済み。倍率設定だけでは不十分なため、サイズ計算やキー寸法の調整を検討する
 - FX OSKのサイズ調整は、既存プロジェクトの自分用ブランチで行う。別端末でも改造版を使う場合は、自分のGitHub Forkへブランチをpushし、別端末からそのブランチをcloneする。元の作者のリポジトリへ直接pushする前提にはしない
@@ -81,6 +83,8 @@
 - THE SESSION TOOLSの操作性改善として、アプリ名の範囲をドラッグ移動専用、三角ボタンを最小化・展開専用に分離済み。三角記号は32px、タッチ領域は44×44pxに拡大し、構文検査と操作イベントの分離確認を完了している
 - THE SESSION TOOLSの三角ボタンは、文字表示からSVG表示へ変更済み。上下両方向の三角の重心がボタン枠の中心に一致するよう座標を調整し、座標検証と構文検査を完了している。Surface実機での配置とタッチ操作確認は未実施
 - THE SESSION TOOLSのREADME・変更履歴・仕様書など5文書について、現行操作・旧設計・未リリース変更の記述を整合済み。ドラッグ範囲、三角ボタンの寸法・重心・操作方法、パネルの最小化とブラウザの最小化の区別を統一し、旧仕様・音響検討メモを過去の記録として明記した。今回の改善は未リリースで既存ZIPには含まれないことも明記済み。文書内のローカルリンクと差分形式の検査は通過済み
+- Foxbook ControlとTHE SESSION TOOLSについても、必要なファイルだけを含むAMOアップロード用ZIPを作成・検査済み。Foxbook Controlには不足していた「データ収集なし」の必須宣言を追加済み。THE SESSION TOOLSのZIPには今回の操作改善を含めた。両ZIPともAMOでの再検証は未実施
+- THE SESSION TOOLSはv0.1.3へ更新済み。README・変更履歴・仕様書などの関連文書を整合し、`/tmp/the-session-tools-0.1.3.zip`を作成・検査済み。ZIP内のバージョン、必要な4ファイル、構文検査を確認済み。v0.1.3のAMO検証は未実施
 
 ## MVP ゴール
 
@@ -123,6 +127,7 @@
 - 通常のWebページ向けキーボード拡張ではFirefoxのアドレスバーや「ファイルを開く」ダイアログを扱えないことを前提に、実際に必要な入力先と対応範囲を整理する
 - THE SESSION TOOLSはメトロノーム専用のままとし、仮想キーボードを同居させない
 - FX OSKでの文字入力は確認済み。入力できなかった原因は未特定。The SessionとGoogle検索の各入力欄で削除・検索実行を確認し、実用性を評価する
+- FX OSKのAMO検証で、manifestの必須宣言とIDの欠落、`innerHTML`使用3箇所、`.git`と別ZIPの混入を確認済み。必須宣言・固定ID・`innerHTML`警告の修正と、梱包スクリプト・READMEの追加は完了済み。`manifest.json`、`kb.js`、`keyboard.js`、`icon.svg`、`icon.png`、`options/`、`LICENSE`だけを含むアップロード用ZIPを作成・検査済み。AMOで再検証し、検証エラーが解消するか確認する
 - FX OSKの倍率設定は初期値90、上限100。Surfaceで設定100を試した結果、タッチ操作に十分な大きさにならないことを確認済み。自分用ブランチ`foxbook-touch`で`devicePixelRatio`を使ったサイズ計算やキー寸法を調整する
 - FX OSKの改造版は、自分のGitHub Forkへpushする手順を確立済み。`foxbook-touch`ブランチは`tuyomori-cyber/Firefox-On-Screen-Keyboard`へpush済みで、`mine/foxbook-touch`を追跡する設定も完了。サイズ調整後は変更をcommit・pushし、別端末ではForkから改造ブランチをcloneして利用する。元の作者のリポジトリには直接pushしない
 - Forkを利用する際は、既存のローカルcloneを削除せず、元の作者のリポジトリを`origin`として維持する。自分のForkを追加remote（例：`mine`）として登録し、`foxbook-touch`ブランチをpushする。ブランチのpushと追跡設定は完了済み
@@ -134,6 +139,8 @@
 - THE SESSION TOOLSの三角ボタンをSVG表示に変更し、上下両方向の三角の重心がボタン枠の中心に一致するよう調整済み。座標検証と構文検査は完了。Surface実機での配置・タッチ操作確認は未完了
 - THE SESSION TOOLSのREADME・変更履歴・仕様書など5文書の整合性を修正済み。現行操作と旧設計を区別し、ドラッグ範囲、三角ボタンの寸法・重心・操作方法、パネルとブラウザの最小化の違いを統一した。旧仕様・音響検討メモは過去の記録として明記し、今回の改善が未リリースで既存ZIPに含まれないことも明記済み。ローカルリンクと差分形式の検査は通過済み
 - THE SESSION TOOLSの操作性改善はコード・文書上の変更を完了したが、Surface実機でのタッチ操作確認は未完了。Firefoxで拡張とThe Sessionのページを再読み込みして確認する必要がある
+- Foxbook ControlとTHE SESSION TOOLSのAMOアップロード用ZIPを作成・検査済み。Foxbook Controlには不足していた「データ収集なし」の必須宣言を追加済み。THE SESSION TOOLSには今回の操作改善を含めた。AMOでの再検証は未実施
+- THE SESSION TOOLSをv0.1.3へ更新し、README・変更履歴・仕様書などの関連文書を整合済み。`/tmp/the-session-tools-0.1.3.zip`を作成・検査済み。ZIP内のバージョン、必要な4ファイル、構文検査を確認済み。AMOでの検証が残っている
 
 ## 未解決論点
 
@@ -151,11 +158,14 @@
 - FX OSKのAMO公開版がFirefox 157/158とSurfaceのCage環境で動作するか。GitHub公開ソースとAMO公開版の差分も未確認
 - FX OSKの英語配列、カーソル途中での削除、検索送信、画面回転時の表示が用途に合うか
 - FX OSKで文字入力できることは確認済みだが、入力できなかった原因は未特定。The SessionとGoogle検索それぞれでの削除・検索実行は未確認
+- FX OSKのAMO検証エラーについて、manifestの必須宣言・固定ID・`innerHTML`警告の修正は完了し、梱包スクリプト・READMEの追加と必要ファイルだけを含むアップロード用ZIPの作成・検査も完了済み。AMOでの再検証が未完了
+- Foxbook ControlとTHE SESSION TOOLSのアップロード用ZIPは作成・検査済み。Foxbook Controlのデータ収集なしの宣言追加とTHE SESSION TOOLSの操作改善の梱包は完了しているが、両拡張ともAMOでの再検証は未完了
 - FX OSKの倍率設定を100にしてもSurface向けの拡大が不足することを確認済み。サイズ計算やキー寸法の調整でタッチ操作に十分な表示サイズを確保できるか
 - 高DPI環境で`devicePixelRatio`による縮小が表示サイズに与える影響。倍率設定だけで不十分なため、改造ブランチでサイズ計算やキー寸法を調整する
 - Surfaceの同期スクリプトで`rclone sync`の成否が終了コードへ正しく反映され、Foxbook Control側の同期結果表示と一致するか
 - URL入力欄および必要な`about:`ページへの専用導線をFoxbook Controlへ実装する必要があるか。現時点では設計案であり未実装
 - THE SESSION TOOLSでアプリ名のドラッグ移動と三角ボタンの最小化・展開がSurfaceのタッチ操作でも意図どおりに動作するか。三角のSVG化、重心の位置調整、コード上のイベント分離とサイズ調整、関連文書の整合性修正は完了しているが、実機での再読み込み後の確認は未実施
+- THE SESSION TOOLS v0.1.3のAMO検証結果。バージョン更新、関連文書の整合、`/tmp/the-session-tools-0.1.3.zip`の作成・検査は完了済みだが、AMOでの検証は未実施
 
 ## 現在の実装・更新先（2026-10-18確認）
 
@@ -167,6 +177,9 @@
 - 輝度取得・変更アクションとスライダー（1〜100%、brightnessctl使用）は実装・コミット済み（f748dc6）。2026-10-18にユーザーがSurface実機で輝度調整の動作確認を完了。確認結果はREADME・仕様書・root-todo・session.mdに反映済み。実機未確認・未コミットとして扱っていた古い記述は修正済み
 - Python単体テスト23件・UIテスト5件成功。旧記述のP2テスト9件は当時の検証記録
 - FX OSKのサイズ調整は未実施。`foxbook-touch` とローカルmasterの差分はなく、既存のサイズ調整ToDoを継続する
+- FX OSKのAMO検証ではmanifestの必須宣言と固定ID、`innerHTML`警告を修正済み。梱包スクリプトとREADMEを追加し、必要ファイルだけを含むアップロード用ZIPを作成・検査済み。AMOでの再検証は未完了
+- Foxbook ControlとTHE SESSION TOOLSのAMOアップロード用ZIPも作成・検査済み。Foxbook Controlには「データ収集なし」の必須宣言を追加し、THE SESSION TOOLSには操作改善を含めた。AMOでの再検証は未完了
+- THE SESSION TOOLSはv0.1.3へ更新済み。関連文書を整合し、`/tmp/the-session-tools-0.1.3.zip`を作成・検査済み。ZIP内のバージョン、必要な4ファイル、構文検査を確認済み。AMOでの再検証は未完了
 - URL入力欄および必要なabout:ページへの専用導線は設計案であり、Foxbook Controlには未実装
 - `llmctx`の参照・更新先は作業リポジトリ内の`.context`へ統一済み。セッション読み込みと自動更新のdry-runで正しい保存先を確認済み
 - 誤った保存先の完了済み会話3件と処理待ちデータを、このリポジトリの `.context` へ引き継いだ。元ファイルは保持する
@@ -177,6 +190,6 @@
 
 ## 次の一手
 
-1. FX OSKの`foxbook-touch`ブランチでサイズ計算とキー寸法を調整し、Surfaceのタッチ操作に十分な大きさになるか確認する。一時読み込みで確認後、変更をcommit・pushする
-2. FX OSKを使い、The SessionとGoogle検索の入力欄で削除・検索実行を確認する。入力できなかった原因の特定は必要に応じて行う
-3. THE SESSION TOOLSをFirefoxで再読み込みし、The Sessionのページも再読み込みして、Surfaceのタッチ操作で三角の配置、ドラッグ移動、最小化・展開が意図どおりに動作するか確認する
+1. FX OSKのAMO検証エラー修正を反映した `/tmp/fx-osk-amo-fixed.zip` をAMOへアップロードして再検証し、検証エラーが解消するか確認する
+2. Foxbook Controlの `/tmp/foxbook-control-amo.zip` とTHE SESSION TOOLSの最新ZIP `/tmp/the-session-tools-0.1.3.zip` をAMOへアップロードして再検証し、検証結果を確認する
+3. FX OSKの`foxbook-touch`ブランチでサイズ計算とキー寸法を調整し、Surfaceのタッチ操作に十分な大きさになるか確認する。一時読み込みで確認後、変更をcommit・pushする

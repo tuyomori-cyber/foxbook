@@ -1,13 +1,12 @@
 # Current State
 
-Updated: 1792327949
+Updated: 1792331073
 
 Now:
-- Done: THE-SESSION-TOOLSの5文書を確認し、現行操作・旧設計・未リリース変更の記述を整合。ローカルリンク検証済み。
+- Done: FX OSKの競合を解消し、マージコミット72dd5daを作成。操作検証・構文検査済み。作業ツリーはクリーン。
 
 Next:
-- Pending: 実機で三角の配置とタッチ操作を確認する。
-- ->
+- Pending: Firefox実機で統合後の操作を確認し、必要に応じて再梱包・pushする。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
