@@ -6,7 +6,9 @@ Firefoxの拡張ページから、ユーザー権限のNative Messaging Hostに�
 
 輝度も音量と同じく、画面を開いたときに現在値を取得し、スライダーを離したときに1回変更します。調整範囲は1〜100%です。「輝度」ボタンで現在値を再取得できます。Hostは`brightness_status`で`/usr/bin/brightnessctl --machine-readable --class=backlight info`、`set_brightness`で同じオプションの`set 整数%`を実行し、変更後の実際の値を表示します。LEDは対象にせず、最初に見つかるバックライトを使用します。
 
-輝度の取得・変更には[`brightnessctl`](https://github.com/Hummer12007/brightnessctl)とバックライト対応デバイスが必要です。Fedoraは`sudo dnf install brightnessctl`、Xubuntuは`sudo apt install brightnessctl`で導入できます。実行ユーザーにバックライト変更権限が必要です。Hostから権限昇格は行いません。Surfaceへの反映はリポジトリを更新し、「Hostを更新」を押してから、`about:debugging`で拡張を再読み込みし、制御ページを開き直してください。取得できない場合、輝度スライダーは無効のままエラーを表示します。Surface/Cageでの実機確認は未実施です。
+輝度の取得・変更には[`brightnessctl`](https://github.com/Hummer12007/brightnessctl)とバックライト対応デバイスが必要です。Fedoraは`sudo dnf install brightnessctl`、Xubuntuは`sudo apt install brightnessctl`で導入できます。実行ユーザーにバックライト変更権限が必要です。Hostから権限昇格は行いません。Surfaceへの反映はリポジトリを更新し、「Hostを更新」を押してから、`about:debugging`で拡張を再読み込みし、制御ページを開き直してください。取得できない場合、輝度スライダーは無効のままエラーを表示します。
+
+2026-10-18にSurface実機で輝度スライダーによる輝度調整の動作を確認済みです（ユーザーによる実機確認）。
 
 ## Xubuntu 24.04での検証
 
