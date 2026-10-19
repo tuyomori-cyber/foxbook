@@ -23,4 +23,9 @@
 - When the snapshot indicates cross-repo work, prefer the repo named in the current Relevant section.
 <!-- END llmctx managed context -->
 
+## ToDo の置き分け
+
+- `.context/root-todo.md`には、現在取り組んでいる作業のNow/Nextだけを短く記載する。完了済みの経緯や別プロジェクトの保留事項を再び展開しない。
+- プロジェクト固有の現状と保留事項は、各リポジトリの`TODO.md`を更新する。横断作業の切り替え時はroot-todoの対象を入れ替える。
+
 
