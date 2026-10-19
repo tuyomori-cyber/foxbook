@@ -4,6 +4,8 @@ import struct
 import subprocess
 import sys
 import tempfile
+import time
+import tracemalloc
 from pathlib import Path
 import unittest
 from unittest import mock
@@ -99,6 +101,7 @@ class NativeHostTests(unittest.TestCase):
                     self.assertEqual(command, ["/usr/bin/brightnessctl", "--machine-readable", "--class=backlight", "set", f"{brightness}%"])
                     self.assertEqual(kwargs["timeout"], host.COMMAND_TIMEOUT_SECONDS)
                     self.assertFalse(kwargs["check"])
+                    self.assertFalse(kwargs["start_new_session"])
                     return subprocess.CompletedProcess(command, 0, stdout=f"intel_backlight,backlight,{brightness},{brightness}%,100\n", stderr="")
 
                 result = host.process_request({"action": "set_brightness", "brightness": brightness}, runner)
@@ -210,6 +213,7 @@ class NativeHostTests(unittest.TestCase):
                 self.assertEqual(command, [str(script)])
                 self.assertEqual(kwargs["timeout"], host.SYNC_TIMEOUT_SECONDS)
                 self.assertFalse(kwargs["check"])
+                self.assertTrue(kwargs["start_new_session"])
                 return subprocess.CompletedProcess(command, 1, stdout="", stderr="sync failed")
 
             with mock.patch.object(host, "score_sync_command", return_value=host.score_sync_command(script)):
@@ -226,6 +230,82 @@ class NativeHostTests(unittest.TestCase):
                 result = host.process_request({"action": "sync_score"}, forbidden_runner)
             self.assertEqual(result["error"]["code"], "COMMAND_FAILED")
             self.assertIn("sync-score.sh", result["error"]["message"])
+
+    def test_normal_score_sync_succeeds_with_real_process(self):
+        with tempfile.TemporaryDirectory() as directory:
+            script = Path(directory) / "sync-score.sh"
+            script.write_text("#!/bin/sh\nprintf 'sync complete\\r\\n'\n")
+            script.chmod(0o700)
+            with mock.patch.object(host, "score_sync_command", return_value=[str(script)]):
+                result = host.process_request({"action": "sync_score"})
+            self.assertEqual(result, {"success": True, "output": "sync complete\n", "error": None})
+
+    def test_score_sync_timeout_keeps_existing_error_code(self):
+        with tempfile.TemporaryDirectory() as directory:
+            script = Path(directory) / "sync-score.sh"
+            script.write_text("#!/bin/sh\nsleep 10\n")
+            script.chmod(0o700)
+            with mock.patch.object(host, "score_sync_command", return_value=[str(script)]), \
+                    mock.patch.object(host, "SYNC_TIMEOUT_SECONDS", 0.2):
+                result = host.process_request({"action": "sync_score"})
+            self.assertEqual(result["error"]["code"], "TIMEOUT")
+            self.assertEqual(result["output"], "")
+
+    def test_timeout_stops_child_process(self):
+        with tempfile.TemporaryDirectory() as directory:
+            marker = Path(directory) / "child-finished"
+            child = (
+                "import time,pathlib; time.sleep(0.5); "
+                f"pathlib.Path({str(marker)!r}).write_text('done')"
+            )
+            parent = (
+                "import subprocess,sys,time; "
+                f"subprocess.Popen([sys.executable, '-c', {child!r}]); "
+                "time.sleep(10)"
+            )
+            with self.assertRaises(subprocess.TimeoutExpired):
+                host.run_command_bounded(
+                    [sys.executable, "-c", parent],
+                    capture_output=True, text=True, timeout=0.3, check=False,
+                    start_new_session=True,
+                )
+            time.sleep(0.6)
+            self.assertFalse(marker.exists())
+
+    def test_timeout_stops_child_after_script_exits(self):
+        with tempfile.TemporaryDirectory() as directory:
+            marker = Path(directory) / "child-finished"
+            child = (
+                "import time,pathlib; time.sleep(0.5); "
+                f"pathlib.Path({str(marker)!r}).write_text('done')"
+            )
+            parent = (
+                "import subprocess,sys; "
+                f"subprocess.Popen([sys.executable, '-c', {child!r}])"
+            )
+            with self.assertRaises(subprocess.TimeoutExpired):
+                host.run_command_bounded(
+                    [sys.executable, "-c", parent],
+                    capture_output=True, text=True, timeout=0.3, check=False,
+                    start_new_session=True,
+                )
+            time.sleep(0.6)
+            self.assertFalse(marker.exists())
+
+    def test_large_output_has_bounded_memory_and_result(self):
+        command = [sys.executable, "-c", "import os; os.write(1, b'x' * 16_000_000); os.write(2, b'y' * 16_000_000)"]
+        tracemalloc.start()
+        try:
+            result = host.run_command_bounded(
+                command, capture_output=True, text=True, timeout=5, check=False,
+            )
+            _, peak = tracemalloc.get_traced_memory()
+        finally:
+            tracemalloc.stop()
+        self.assertEqual(result.returncode, 0)
+        self.assertEqual(len(result.stdout), host.MAX_STDOUT_BYTES)
+        self.assertEqual(len(result.stderr), host.MAX_STDERR_BYTES)
+        self.assertLess(peak, 2_000_000)
 
     def test_extra_fields_are_rejected_without_running_command(self):
         def forbidden_runner(*args, **kwargs):

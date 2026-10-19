@@ -1,12 +1,13 @@
 # Current State
 
-Updated: 1792331073
+Updated: 1792393710
 
 Now:
-- Done: FX OSKの競合を解消し、マージコミット72dd5daを作成。操作検証・構文検査済み。作業ツリーはクリーン。
+- Pending: Surfaceで輝度取得とスライダー操作を実機確認。
 
 Next:
-- Pending: Firefox実機で統合後の操作を確認し、必要に応じて再梱包・pushする。
+- Surfaceでの確認結果を受けて、この件を完了とする。
+- ->
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -16,7 +17,7 @@ Relevant:
 - context: foxbook
 - repo: Firefox-On-Screen-Keyboard
 - repo: THE-SESSION-TOOLS
+- repo: fox-voice-editor
 - repo: foxbook-control
 - cwd: /home/tuyomori/project/foxbook-control
-- file: .context/session.md
 

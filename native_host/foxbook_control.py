@@ -4,11 +4,15 @@
 from __future__ import annotations
 
 import json
+import locale
 import logging
 import os
+import selectors
+import signal
 import struct
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -17,6 +21,9 @@ MAX_REQUEST_BYTES = 65536
 COMMAND_TIMEOUT_SECONDS = 5
 UPDATE_TIMEOUT_SECONDS = 30
 SYNC_TIMEOUT_SECONDS = 900
+MAX_STDOUT_BYTES = 65536
+MAX_STDERR_BYTES = 4096
+TERMINATION_GRACE_SECONDS = 1
 LOGGER = logging.getLogger("foxbook_control")
 COMMANDS = {
     "system_info": ("/usr/bin/uname", "-a"),
@@ -77,8 +84,92 @@ def score_sync_command(script: Path = SCORE_SYNC_SCRIPT) -> list[str]:
     return [str(script)]
 
 
+def run_command_bounded(
+    command: list[str], *, capture_output: bool, text: bool, timeout: int | float, check: bool,
+    start_new_session: bool = False,
+) -> subprocess.CompletedProcess[str]:
+    """Run a command with bounded captured output and optional group cleanup."""
+    if not capture_output or not text or check:
+        raise ValueError("unsupported command options")
+
+    process = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+        start_new_session=start_new_session,
+    )
+    captured = {"stdout": bytearray(), "stderr": bytearray()}
+    limits = {"stdout": MAX_STDOUT_BYTES, "stderr": MAX_STDERR_BYTES}
+    truncated = {"stdout": False, "stderr": False}
+    deadline = time.monotonic() + timeout
+
+    def signal_process(signum: int) -> None:
+        try:
+            if start_new_session:
+                os.killpg(process.pid, signum)
+            else:
+                process.send_signal(signum)
+        except ProcessLookupError:
+            pass
+
+    with selectors.DefaultSelector() as selector:
+        try:
+            for name, pipe in (("stdout", process.stdout), ("stderr", process.stderr)):
+                assert pipe is not None
+                selector.register(pipe, selectors.EVENT_READ, name)
+            while selector.get_map():
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    raise subprocess.TimeoutExpired(command, timeout)
+                for key, _ in selector.select(remaining):
+                    chunk = os.read(key.fd, 65536)
+                    if not chunk:
+                        selector.unregister(key.fileobj)
+                        continue
+                    output = captured[key.data]
+                    available = max(0, limits[key.data] - len(output))
+                    output.extend(chunk[:available])
+                    if len(chunk) > available:
+                        truncated[key.data] = True
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                raise subprocess.TimeoutExpired(command, timeout)
+            process.wait(timeout=remaining)
+        except subprocess.TimeoutExpired:
+            # The script may have exited while rclone still holds a pipe open.
+            # Kill the process group even when its original leader has exited.
+            signal_process(signal.SIGTERM)
+            try:
+                process.wait(timeout=TERMINATION_GRACE_SECONDS)
+            except subprocess.TimeoutExpired:
+                pass
+            signal_process(signal.SIGKILL)
+            process.wait()
+            raise
+        except BaseException:
+            signal_process(signal.SIGKILL)
+            process.wait()
+            raise
+        finally:
+            if process.stdout is not None:
+                process.stdout.close()
+            if process.stderr is not None:
+                process.stderr.close()
+
+    encoding = locale.getpreferredencoding(False)
+    def decoded_output(name: str) -> str:
+        value = captured[name].decode(
+            encoding, errors="replace" if truncated[name] else "strict",
+        )
+        return value.replace("\r\n", "\n").replace("\r", "\n")
+
+    return subprocess.CompletedProcess(
+        command, process.returncode,
+        stdout=decoded_output("stdout"),
+        stderr=decoded_output("stderr"),
+    )
+
+
 def process_request(
-    request: Any, run_command: Callable[..., Any] = subprocess.run, battery_root: Path = BATTERY_ROOT,
+    request: Any, run_command: Callable[..., Any] = run_command_bounded, battery_root: Path = BATTERY_ROOT,
     environment: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     if not isinstance(request, dict) or not isinstance(request.get("action"), str):
@@ -122,6 +213,7 @@ def process_request(
             timeout=(SYNC_TIMEOUT_SECONDS if action == "sync_score" else
                      UPDATE_TIMEOUT_SECONDS if action == "update_host" else COMMAND_TIMEOUT_SECONDS),
             check=False,
+            start_new_session=action == "sync_score",
         )
     except subprocess.TimeoutExpired:
         LOGGER.warning(

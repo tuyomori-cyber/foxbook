@@ -8,6 +8,12 @@
 		},
 		{
 			"path": "../THE-SESSION-TOOLS"
+		},
+		{
+			"path": "../whisper.cpp"
+		},
+		{
+			"path": "../fox-voice-editor"
 		}
 	]
 }
