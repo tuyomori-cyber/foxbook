@@ -1,12 +1,13 @@
 # Current State
 
-Updated: 1792411894
+Updated: 1792503694
 
 Now:
-- Done: 移動の影響を調査し、両Hostの更新元切れと再登録による復旧を一時環境で確認。
+- Done: Firefox内のモデル選択を実装。実Hostでgpt-5.6-solの正常応答を確認。
+- Done: Host更新登録、Host試験10件と画面ロジック試験が成功。
 
 Next:
-- Pending: 移動する場合、Host再登録・拡張読込元・whisperビルド・Surface起動設定を確認。
+- Pending: Firefoxでモデル選択から正常応答までを確認。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -16,7 +17,7 @@ Relevant:
 - context: foxbook
 - repo: Firefox-On-Screen-Keyboard
 - repo: THE-SESSION-TOOLS
+- repo: focodex
 - repo: fox-voice-editor
 - repo: foxbook-control
-- cwd: /home/tuyomori/project/foxbook-control
 

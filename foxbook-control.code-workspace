@@ -17,6 +17,9 @@
 		},
 		{
 			"path": "../cage"
+		},
+		{
+			"path": "../focodex"
 		}
 	]
 }
