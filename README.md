@@ -10,6 +10,18 @@ Firefoxの拡張ページから、ユーザー権限のNative Messaging Hostに�
 
 2026-10-18にSurface実機で輝度スライダーによる輝度調整の動作を確認済みです（ユーザーによる実機確認）。
 
+## 画面回転（Cage / Surface）
+
+「画面の向き」に現在の縦横と切替ボタンを表示します。既存と同じFirefox Native MessagingでHostへ`rotation_status`または`toggle_rotation`を送り、Hostが固定の`/usr/bin/wlr-randr`を実行します。追加の通信サーバーは不要です。`wlr-randr`が必要です。
+
+このワークスペースのCageは`wlr_output_manager_v1`を作成し、出力変更時に設定を通知しています（`../cage/cage.c`、`../cage/output.c`）。wlrootsは現在の`output->transform`を公開しています。Cage独自のHTTP APIは必要なく、[wlr-randrの実装](https://github.com/emersion/wlr-randr/blob/master/main.c)がこのWaylandプロトコルを読み取り、引数なしで`Transform: normal`などを表示します。
+
+Hostはユーザー確認済みの接続先に合わせ、`XDG_RUNTIME_DIR=/run/user/<実行ユーザーUID>`と`WAYLAND_DISPLAY=wayland-0`を設定します。シェルは使用しません。対象は`eDP-1`固定で、横画面は`normal`、縦画面は`90`です。クリックごとに現在の向きを再取得してから、`--output eDP-1 --transform 90`または`--output eDP-1 --transform normal`を実行し、変更後も再取得して一致を確認します。外部から向きが変更されても、前回の表示値だけで切り替えません。
+
+対象出力がない・無効・向きを取得できない・`normal`と`90`以外の場合は切替を実行しません。取得・変更・確認に失敗した場合は向きを未取得に戻して回転ボタンを無効にします。「向きを再取得」で取得できると再び有効になります。
+
+Surfaceへの反映は、リポジトリを更新 → 制御ページの「Hostを更新」 → `about:debugging`で拡張を再読み込み → 制御ページを開き直す、の順です。2026-10-19に、ユーザーがSurface実機で追加ボタン経由の画面回転を確認済みです。
+
 ## Xubuntu 24.04での検証
 
 1. [Mozilla公式のLinux版Firefox](https://support.mozilla.org/ja/kb/install-firefox-linux)を取得し、配布物のディレクトリ構造を保って`~/.local/opt/foxbook-firefox/`に配置します。`~/.local/opt/foxbook-firefox/firefox`が実行ファイルとなるようにします。既存のSnap版には触れません。

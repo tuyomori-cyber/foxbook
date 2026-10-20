@@ -1,12 +1,12 @@
 # Current State
 
-Updated: 1792400041
+Updated: 1792411894
 
 Now:
-- Done: 横並びの編集・履歴ペイン、角丸ブロック、ドラッグ並べ替え、履歴選択と「…」操作を実装。自動試験8件成功。
+- Done: 移動の影響を調査し、両Hostの更新元切れと再登録による復旧を一時環境で確認。
 
 Next:
-- Pending: FirefoxとSurfaceで表示、タッチドラッグ、前後挿入、保存と復元を確認。
+- Pending: 移動する場合、Host再登録・拡張読込元・whisperビルド・Surface起動設定を確認。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.

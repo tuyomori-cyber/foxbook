@@ -13,9 +13,26 @@ const volumeSlider = document.getElementById("volume-slider");
 const volumeValue = document.getElementById("volume-value");
 const brightnessSlider = document.getElementById("brightness-slider");
 const brightnessValue = document.getElementById("brightness-value");
+const rotationButton = document.getElementById("rotation-toggle");
+const rotationValue = document.getElementById("rotation-value");
 let currentRequest = 0;
 let confirmedVolume = null;
 let confirmedBrightness = null;
+let confirmedRotation = null;
+
+function clearRotation() {
+  confirmedRotation = null;
+  rotationValue.textContent = "現在の向き：未取得";
+  rotationButton.textContent = "画面を回転";
+}
+
+function readRotation(text) {
+  if (!["normal", "90"].includes(text)) return false;
+  confirmedRotation = text;
+  rotationValue.textContent = `現在の向き：${text === "normal" ? "横画面" : "縦画面"}`;
+  rotationButton.textContent = text === "normal" ? "縦画面にする" : "横画面にする";
+  return true;
+}
 
 function showResult(message, text = "", code = "") {
   status.textContent = message;
@@ -58,18 +75,21 @@ function readBrightness(text) {
 function requestStatus(action, request = { action }) {
   const isUpdate = action === "update_host";
   const isSync = action === "sync_score";
+  const isRotation = action === "rotation_status" || action === "toggle_rotation";
+  if (action === "toggle_rotation" && confirmedRotation === null) return Promise.resolve();
   const isSet = action === "set_volume" || action === "set_brightness";
   if (isUpdate && !window.confirm("更新元のリポジトリからNative Hostを再インストールします。続けますか？")) return;
   const requestId = ++currentRequest;
   const label = action === "set_volume" ? "音量" : action === "set_brightness" ? "輝度" : buttons.find((button) => button.dataset.action === action).textContent.trim();
+  if (isRotation) clearRotation();
   buttons.forEach((button) => { button.disabled = true; });
   volumeSlider.disabled = true;
   brightnessSlider.disabled = true;
-  showResult(isUpdate ? "Native Hostを更新中…" : isSync ? "Dropboxから楽譜を同期中…" : isSet ? `${label}を変更中…` : `${label}を取得中…`);
+  showResult(isRotation ? (action === "toggle_rotation" ? "画面を回転中…" : "画面の向きを取得中…") : isUpdate ? "Native Hostを更新中…" : isSync ? "Dropboxから楽譜を同期中…" : isSet ? `${label}を変更中…` : `${label}を取得中…`);
 
   let timer;
   const timeout = new Promise((_, reject) => {
-    timer = setTimeout(() => reject(new Error("応答待機が時間内に完了しませんでした")), isSync ? SYNC_TIMEOUT_MS : isUpdate ? UPDATE_TIMEOUT_MS : RESPONSE_TIMEOUT_MS);
+    timer = setTimeout(() => reject(new Error("応答待機が時間内に完了しませんでした")), isSync ? SYNC_TIMEOUT_MS : isUpdate ? UPDATE_TIMEOUT_MS : isRotation ? 20_000 : RESPONSE_TIMEOUT_MS);
   });
 
   return Promise.race([
@@ -80,7 +100,11 @@ function requestStatus(action, request = { action }) {
     if (!response || typeof response.success !== "boolean" || typeof response.output !== "string") {
       showResult("システム機能から正しい応答を受け取れませんでした。", "", "HOST_UNAVAILABLE");
     } else if (response.success && response.error === null) {
-      if (action === "audio_status" && !readVolume(response.output)) {
+      if (isRotation && !readRotation(response.output)) {
+        showResult("画面の向きを読み取れませんでした。向きを再取得してください。", "", "COMMAND_FAILED");
+      } else if (isRotation) {
+        showResult(action === "toggle_rotation" ? "画面を回転しました。" : "画面の向きを取得しました。", rotationValue.textContent);
+      } else if (action === "audio_status" && !readVolume(response.output)) {
         showResult("音量の取得結果を読み取れませんでした。", response.output, "COMMAND_FAILED");
       } else if ((action === "brightness_status" || action === "set_brightness") && !readBrightness(response.output)) {
         showResult("輝度の取得結果を読み取れませんでした。輝度ボタンで再取得してください。", "", "COMMAND_FAILED");
@@ -94,7 +118,7 @@ function requestStatus(action, request = { action }) {
         showResult(isUpdate ? "Native Hostを更新しました。" : isSync ? "楽譜の同期が完了しました。" : `${label}を取得しました。`, response.output);
       }
     } else if (!response.success && response.error && typeof response.error.code === "string" && typeof response.error.message === "string") {
-      const message = (isSet || action === "brightness_status") && ["INVALID_REQUEST", "UNKNOWN_ACTION"].includes(response.error.code)
+      const message = (isRotation || isSet || action === "brightness_status") && ["INVALID_REQUEST", "UNKNOWN_ACTION"].includes(response.error.code)
         ? "Native Hostが古い可能性があります。Hostを更新してください。"
         : response.error.message;
       showResult(message, "", response.error.code);
@@ -114,6 +138,7 @@ function requestStatus(action, request = { action }) {
       if (action === "set_volume" && confirmedVolume !== request.volume && confirmedVolume !== null) showVolume(confirmedVolume);
       if (action === "set_brightness" && confirmedBrightness !== null) showBrightness(confirmedBrightness);
       buttons.forEach((button) => { button.disabled = false; });
+      rotationButton.disabled = confirmedRotation === null;
       volumeSlider.disabled = confirmedVolume === null;
       brightnessSlider.disabled = confirmedBrightness === null;
     }
@@ -142,7 +167,7 @@ brightnessSlider.addEventListener("change", () => {
   if (brightness !== confirmedBrightness) requestStatus("set_brightness", { action: "set_brightness", brightness });
 });
 
-requestStatus("audio_status").then(() => requestStatus("brightness_status"));
+requestStatus("audio_status").then(() => requestStatus("brightness_status")).then(() => requestStatus("rotation_status"));
 
 logoutButton.addEventListener("click", async () => {
   if (!window.confirm("Cageのログインセッションを終了します。開いている作業は失われます。続けますか？")) return;

@@ -34,6 +34,12 @@
       <input id="brightness-slider" type="range" min="1" max="100" step="1" value="1" disabled>
       <p>スライダーを離すと設定します。</p>
     </div>
+    <section aria-labelledby="rotation-title">
+      <h2 id="rotation-title">画面の向き</h2>
+      <p id="rotation-value" role="status">現在の向き：未取得</p>
+      <button id="rotation-toggle" data-action="toggle_rotation" type="button" disabled>画面を回転</button>
+      <button data-action="rotation_status" type="button">向きを再取得</button>
+    </section>
     <section aria-labelledby="score-title">
       <h2 id="score-title">楽譜</h2>
       <button data-action="sync_score" type="button">Dropboxから楽譜を同期</button>

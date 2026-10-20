@@ -86,7 +86,7 @@ def score_sync_command(script: Path = SCORE_SYNC_SCRIPT) -> list[str]:
 
 def run_command_bounded(
     command: list[str], *, capture_output: bool, text: bool, timeout: int | float, check: bool,
-    start_new_session: bool = False,
+    start_new_session: bool = False, env: Mapping[str, str] | None = None,
 ) -> subprocess.CompletedProcess[str]:
     """Run a command with bounded captured output and optional group cleanup."""
     if not capture_output or not text or check:
@@ -95,6 +95,7 @@ def run_command_bounded(
     process = subprocess.Popen(
         command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
         start_new_session=start_new_session,
+        env=env,
     )
     captured = {"stdout": bytearray(), "stderr": bytearray()}
     limits = {"stdout": MAX_STDOUT_BYTES, "stderr": MAX_STDERR_BYTES}
@@ -168,6 +169,50 @@ def run_command_bounded(
     )
 
 
+def display_transform(text: str) -> str:
+    """Read only the enabled eDP-1 head; never infer state from another output."""
+    heads: list[list[str]] = []
+    for line in text.splitlines():
+        if line and not line[0].isspace():
+            heads.append([line])
+        elif heads:
+            heads[-1].append(line.strip())
+    matches = [head for head in heads if head[0].split()[0] == "eDP-1"]
+    if len(matches) != 1 or matches[0].count("Enabled: yes") != 1:
+        raise ValueError("eDP-1の有効な出力を取得できません。")
+    transforms = [line.removeprefix("Transform: ") for line in matches[0] if line.startswith("Transform: ")]
+    if len(transforms) != 1 or transforms[0] not in ("normal", "90"):
+        raise ValueError("eDP-1の向きを取得できないか、normal / 90 以外の向きです。")
+    return transforms[0]
+
+
+def rotation_request(action: str, run_command: Callable[..., Any], environment: Mapping[str, str]) -> dict[str, Any]:
+    env = dict(environment)
+    env.update(XDG_RUNTIME_DIR=f"/run/user/{os.getuid()}", WAYLAND_DISPLAY="wayland-0", LC_ALL="C")
+
+    def run(*args: str) -> str:
+        result = run_command(
+            ["/usr/bin/wlr-randr", *args], capture_output=True, text=True,
+            timeout=COMMAND_TIMEOUT_SECONDS, check=False, env=env,
+        )
+        if result.returncode != 0:
+            LOGGER.error("wlr-randr failed: returncode=%s stderr=%r", result.returncode, result.stderr[:4096])
+            raise ValueError("画面の向きの取得・変更に失敗しました。Cageとwayland-0を確認してください。")
+        return result.stdout
+
+    try:
+        current = display_transform(run())
+        if action == "toggle_rotation":
+            target = "90" if current == "normal" else "normal"
+            run("--output", "eDP-1", "--transform", target)
+            current = display_transform(run())
+            if current != target:
+                raise ValueError("変更後の画面の向きが一致しません。向きを再取得してください。")
+        return response(True, output=current)
+    except ValueError as exc:
+        return response(False, code="COMMAND_FAILED", message=str(exc))
+
+
 def process_request(
     request: Any, run_command: Callable[..., Any] = run_command_bounded, battery_root: Path = BATTERY_ROOT,
     environment: Mapping[str, str] | None = None,
@@ -183,12 +228,14 @@ def process_request(
             return response(False, code="INVALID_REQUEST", message=f"{label}は{minimum}から100の整数で指定してください。")
     elif set(request) != {"action"}:
         return response(False, code="INVALID_REQUEST", message="要求の形式が正しくありません。")
-    if action not in COMMANDS and action not in ("battery_status", "update_host", "set_volume", "set_brightness", "sync_score"):
+    if action not in COMMANDS and action not in ("battery_status", "update_host", "set_volume", "set_brightness", "sync_score", "rotation_status", "toggle_rotation"):
         return response(False, code="UNKNOWN_ACTION", message="未登録の操作です。")
     if action == "cage_logout" and (environment if environment is not None else os.environ).get("FOXBOOK_CAGE_SESSION") != "1":
         return response(False, code="PERMISSION_DENIED", message="Cageセッションからのみログアウトできます。")
 
     try:
+        if action in ("rotation_status", "toggle_rotation"):
+            return rotation_request(action, run_command, environment if environment is not None else os.environ)
         if action == "battery_status":
             return response(True, output=battery_status(battery_root))
         if action == "update_host":
@@ -227,7 +274,8 @@ def process_request(
         return response(False, code="PERMISSION_DENIED", message="この操作を実行する権限がありません。")
     except FileNotFoundError as exc:
         LOGGER.error("command not found: action=%s errno=%s", action, exc.errno)
-        message = "brightnessctlが見つかりません。インストールしてください。" if action in ("brightness_status", "set_brightness") else "操作を完了できませんでした。"
+        message = ("wlr-randrが見つかりません。インストールしてください。" if action in ("rotation_status", "toggle_rotation") else
+                   "brightnessctlが見つかりません。インストールしてください。" if action in ("brightness_status", "set_brightness") else "操作を完了できませんでした。")
         return response(False, code="COMMAND_FAILED", message=message)
     except OSError as exc:
         LOGGER.error("command start failed: action=%s errno=%s", request["action"], exc.errno)

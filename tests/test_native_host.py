@@ -16,6 +16,68 @@ import foxbook_control as host  # noqa: E402
 
 
 class NativeHostTests(unittest.TestCase):
+    @staticmethod
+    def display_output(transform="normal"):
+        return ("HDMI-A-1 external\n  Enabled: yes\n  Transform: 270\n"
+                f"eDP-1 Surface panel\n  Enabled: yes\n  Transform: {transform}\n  Scale: 1.5\n")
+
+    def test_rotation_status_and_both_toggle_directions(self):
+        for action, current in (("rotation_status", "normal"), ("toggle_rotation", "normal"), ("toggle_rotation", "90")):
+            with self.subTest(action=action, current=current):
+                target = "90" if current == "normal" else "normal"
+                outputs = [self.display_output(current)]
+                expected = [["/usr/bin/wlr-randr"]]
+                if action == "toggle_rotation":
+                    outputs += ["", self.display_output(target)]
+                    expected += [["/usr/bin/wlr-randr", "--output", "eDP-1", "--transform", target], ["/usr/bin/wlr-randr"]]
+                runner = mock.Mock(side_effect=[subprocess.CompletedProcess([], 0, stdout=text, stderr="") for text in outputs])
+                result = host.process_request({"action": action}, runner, environment={"WAYLAND_DISPLAY": "wrong", "KEEP": "value"})
+                self.assertEqual(result, host.response(True, output=target if action == "toggle_rotation" else current))
+                self.assertEqual([call.args[0] for call in runner.call_args_list], expected)
+                for call in runner.call_args_list:
+                    self.assertEqual(call.kwargs["env"]["XDG_RUNTIME_DIR"], f"/run/user/{host.os.getuid()}")
+                    self.assertEqual(call.kwargs["env"]["WAYLAND_DISPLAY"], "wayland-0")
+                    self.assertEqual(call.kwargs["env"]["LC_ALL"], "C")
+                    self.assertEqual(call.kwargs["env"]["KEEP"], "value")
+
+    def test_rotation_never_changes_unknown_disabled_or_missing_output(self):
+        outputs = ["", "HDMI-A-1\n  Enabled: yes\n  Transform: normal\n",
+                   self.display_output("180"), self.display_output("flipped"),
+                   self.display_output().replace("Enabled: yes", "Enabled: no"),
+                   self.display_output().replace("Transform: normal", "Transform: normal\n  Transform: 90"),
+                   self.display_output() + self.display_output(),
+                   self.display_output().replace("Transform: normal", "Scale: 1")]
+        for text in outputs:
+            with self.subTest(text=text):
+                runner = mock.Mock(return_value=subprocess.CompletedProcess([], 0, stdout=text, stderr=""))
+                result = host.process_request({"action": "toggle_rotation"}, runner)
+                self.assertEqual(result["error"]["code"], "COMMAND_FAILED")
+                self.assertEqual(runner.call_count, 1)
+
+    def test_rotation_failed_command_or_verification_is_not_success(self):
+        ok = subprocess.CompletedProcess([], 0, stdout=self.display_output(), stderr="")
+        bad = subprocess.CompletedProcess([], 1, stdout="", stderr="failed")
+        for results in ([bad], [ok, bad], [ok, ok, bad], [ok, ok, ok]):
+            with self.subTest(results=results):
+                result = host.process_request({"action": "toggle_rotation"}, mock.Mock(side_effect=results))
+                self.assertEqual(result["error"]["code"], "COMMAND_FAILED")
+
+    def test_rotation_missing_tool_permission_and_timeout_errors(self):
+        for exception, code in ((FileNotFoundError(), "COMMAND_FAILED"), (PermissionError(), "PERMISSION_DENIED"),
+                                (subprocess.TimeoutExpired("wlr-randr", 5), "TIMEOUT")):
+            with self.subTest(exception=exception):
+                result = host.process_request({"action": "rotation_status"}, mock.Mock(side_effect=exception))
+                self.assertEqual(result["error"]["code"], code)
+                if isinstance(exception, FileNotFoundError):
+                    self.assertIn("wlr-randr", result["error"]["message"])
+
+    def test_rotation_rejects_client_commands_and_targets(self):
+        runner = mock.Mock()
+        for action in ("rotation_status", "toggle_rotation"):
+            result = host.process_request({"action": action, "output": "HDMI-A-1"}, runner)
+            self.assertEqual(result["error"]["code"], "INVALID_REQUEST")
+        runner.assert_not_called()
+
     def test_unknown_action_returns_framed_json_without_running_command(self):
         calls = []
 
