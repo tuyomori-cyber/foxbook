@@ -1,13 +1,12 @@
 # Current State
 
-Updated: 1792503694
+Updated: 1792585899
 
 Now:
-- Done: Firefox内のモデル選択を実装。実Hostでgpt-5.6-solの正常応答を確認。
-- Done: Host更新登録、Host試験10件と画面ロジック試験が成功。
+- Done: 選択とドラッグをモード分離し、Surfaceのタッチで選択・複数選択・選択解除・ドラッグ並べ替えが動作。Nodeモデル7件、Native Host 10件が成功。
 
 Next:
-- Pending: Firefoxでモデル選択から正常応答までを確認。
+- Pending: 必要に応じてfox-voice-editor/TODO.mdの残るSurface統合確認を進める。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -15,9 +14,9 @@ Constraints:
 
 Relevant:
 - context: foxbook
-- repo: Firefox-On-Screen-Keyboard
-- repo: THE-SESSION-TOOLS
-- repo: focodex
 - repo: fox-voice-editor
 - repo: foxbook-control
+- cwd: /home/tuyomori/project/foxbook-control
+- file: .context/session.md
+- file: .context/turns.jsonl
 
