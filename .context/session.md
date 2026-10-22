@@ -1,14 +1,12 @@
 # Current State
 
-Updated: 1792657689
+Updated: 1792679417
 
 Now:
-- Done: focodex第2段階を実装し、関連文書を整合。
-- Done: Python試験47件、画面・受信バッファ試験が成功。
-- Pending: 登録済みHostの更新とFirefox・Surface実機確認。
+- Done: ステージ済みファイルを「ステージ済み（解除は未対応）」と明示し、解除機能の安全設計をFocodex TODOへ記録。
 
 Next:
-- Host再登録と拡張・操作タブ再読み込み後、第2段階と受信バッファ連携を実機確認する。
+- FirefoxでGit操作、Commit最終確認、受信バッファ、実行設定連動、ステージ済み表示を実機確認する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.

@@ -4,8 +4,10 @@
 
 ## Now
 
-- Focodex第2段階のStatus・選択的ステージ・固定tree確認・Commit・Commit欄への明示反映を実装。Git設定検査・永続的禁止と実Git・画面試験を整備。
+- Done: 単独リポジトリGit、受信バッファ切断時のローカル操作維持、実行設定とGit対象の連動、Commit最終確認の要約・詳細・取消を実装。Host確定時点のステージ済み一覧を使用し、既存Git安全機構を維持。
+- Done: ステージ済みファイルを「ステージ済み（解除は未対応）」と明示し、将来の解除機能は安全設計を含む保留事項として記録。
+- Pending: Firefox実機でGit操作と受信バッファ、実行設定連動、Commit最終確認を確認。確認後の状態変化時に再確認が要求されることも確認する。
 
 ## Next
 
-- Host再登録と拡張・操作タブの再読み込み後、Firefoxで第2段階の操作と受信バッファ連携を確認する。Surfaceタッチも未確認。Pull・Pushは対象外。詳細はfocodex/TODO.mdを参照。
+- `python3 scripts/install_host.py` で更新後のHostを再登録し、FirefoxのFocodex拡張と操作タブを再読み込みして、`git-test` のGit操作、Commit最終確認、受信バッファ、実行設定連動、ステージ済み表示を確認する。詳細はfocodex/TODO.mdを参照。
