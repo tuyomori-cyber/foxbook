@@ -1,6 +1,6 @@
 # Foxbook Control 現状 ToDo
 
-更新日：2026-10-19
+更新日：2026-10-22
 
 ## 現状
 
@@ -14,6 +14,7 @@
 
 ## 未完了
 
+- [ ] Surface / Cageで仮想マウスを使わずに分割ビュー比率を変更する。AutoConfigのツールバースライダーで左側30〜60%を5%刻みで変更・保存する実装を追加済み。XubuntuのMozilla公式Firefox 158ではスライダーDOM生成と自動適用を確認済み。次はXubuntuとFedoraで実操作、Firefox標準のツールバーカスタマイズによる非表示・再表示を確認する。Snap版Firefoxは対象外。導入手順は`experiments/splitview-autoconfig/README.md`を参照。
 - [ ] Fedora実機で「Hostを更新」ボタンとP3の電池・ネットワーク・音量表示を確認する。
 - [ ] `/tmp/foxbook-control-amo.zip`をAMOで再検証し、結果を確認する。
 - [ ] Surfaceの`~/bin/sync-score.sh`で`rclone sync`の失敗が終了コードに反映されるよう修正し、同期成功・失敗時の画面表示を確認する。修正例と手順はREADMEに記載済み。

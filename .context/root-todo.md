@@ -4,11 +4,9 @@
 
 ## Now
 
-- focodexにFirefox内のモデル候補取得・選択・再取得・選択保存を追加し、Hostを更新登録済み。既存のCodex権限と設定ファイルは変更しない。
-- CLI 0.163.0の実Host試験で`gpt-5.6-sol`を明示選択し、正常応答「Focodex接続成功」を確認。Host試験10件と画面ロジック試験が成功。
-- Firefox内だけで操作を完結させるためのモデル選択機能を実装済み。Firefox画面からモデル選択・指示送信・正常応答までの全経路は未確認。
+- `/home/tuyomori/project/foxbook-control`で、FirefoxツールバーのSplit View比率スライダーをXubuntuとFedoraで手動確認する。
 
 ## Next
 
-- 作業対象：`/home/tuyomori/project/focodex`。Firefoxの拡張と操作タブを再読み込みし、「Hostへ接続」からモデル候補取得・選択・指示送信・正常応答までを確認する。
-- 拒否後に別モデルを選択して再送する経路も確認する。全経路確認後、承認・追加質問・停止の検証へ進む。詳細は`focodex/TODO.md`を参照。
+- Firefox標準のツールバーカスタマイズで、スライダーを非表示・再表示できることを確認する。
+- 詳細は`foxbook-control/specification/split-view-touch-options.md`を参照。

@@ -1,13 +1,14 @@
 # Current State
 
-Updated: 1792503694
+Updated: 1792634161
 
 Now:
-- Done: Firefox内のモデル選択を実装。実Hostでgpt-5.6-solの正常応答を確認。
-- Done: Host更新登録、Host試験10件と画面ロジック試験が成功。
+- Done: 導入手順と運用方法をAutoConfig READMEへ集約し、設計・TODOを現行の比率スライダー実装へ更新。
+- Pending: XubuntuとFedoraでスライダー実操作、Firefox標準のツールバー非表示・再表示を確認する。
 
 Next:
-- Pending: Firefoxでモデル選択から正常応答までを確認。
+- 保存操作を実装し、XubuntuとFedoraで検証する。
+- ->
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
