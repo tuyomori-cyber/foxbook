@@ -1,13 +1,14 @@
 # Current State
 
-Updated: 1792634161
+Updated: 1792657689
 
 Now:
-- Done: 導入手順と運用方法をAutoConfig READMEへ集約し、設計・TODOを現行の比率スライダー実装へ更新。
-- Pending: XubuntuとFedoraでスライダー実操作、Firefox標準のツールバー非表示・再表示を確認する。
+- Done: focodex第2段階を実装し、関連文書を整合。
+- Done: Python試験47件、画面・受信バッファ試験が成功。
+- Pending: 登録済みHostの更新とFirefox・Surface実機確認。
 
 Next:
-- XubuntuとFedoraでスライダー実操作と、Firefox標準のツールバー非表示・再表示を確認する。
+- Host再登録と拡張・操作タブ再読み込み後、第2段階と受信バッファ連携を実機確認する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -15,9 +16,9 @@ Constraints:
 
 Relevant:
 - context: foxbook
-- repo: Firefox-On-Screen-Keyboard
-- repo: THE-SESSION-TOOLS
 - repo: focodex
 - repo: fox-voice-editor
 - repo: foxbook-control
+- repo: specification
+- cwd: /home/tuyomori/project/foxbook-control
 
