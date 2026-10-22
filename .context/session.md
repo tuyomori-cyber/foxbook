@@ -7,8 +7,7 @@ Now:
 - Pending: XubuntuとFedoraでスライダー実操作、Firefox標準のツールバー非表示・再表示を確認する。
 
 Next:
-- 保存操作を実装し、XubuntuとFedoraで検証する。
-- ->
+- XubuntuとFedoraでスライダー実操作と、Firefox標準のツールバー非表示・再表示を確認する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
