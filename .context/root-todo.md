@@ -4,10 +4,12 @@
 
 ## Now
 
-- Done: 単独リポジトリGit、受信バッファ切断時のローカル操作維持、実行設定とGit対象の連動、Commit最終確認の要約・詳細・取消を実装。Host確定時点のステージ済み一覧を使用し、既存Git安全機構を維持。
-- Done: ステージ済みファイルを「ステージ済み（解除は未対応）」と明示し、将来の解除機能は安全設計を含む保留事項として記録。
-- Pending: Firefox実機でGit操作と受信バッファ、実行設定連動、Commit最終確認を確認。確認後の状態変化時に再確認が要求されることも確認する。
+- Done: GNOME KeyringのLoginコレクションがGDM/PAMで自動解除されることをSurface再起動後に確認。
+- Done: 固定宛先・専用Agent・最小known_hosts・中継を統合した読み取り専用SSH接続試験を実装・回帰確認。
+- Done: Surfaceでfoxbookログイン後の専用Agent再生成・鍵自動登録が`ready`になることを確認。
+- Done: 終了未確認の安全停止解除、明示SSH URL化、専用Agent・直接`ls-remote`・中継事前試験をSurfaceで確認。
+- Pending: Focodex固定中継経路では`wrapper-command`後に中継未到達。実upstream読み取り専用試験は未成功。
 
 ## Next
 
-- `python3 scripts/install_host.py` で更新後のHostを再登録し、FirefoxのFocodex拡張と操作タブを再読み込みして、`git-test` のGit操作、Commit最終確認、受信バッファ、実行設定連動、ステージ済み表示を確認する。詳細はfocodex/TODO.mdを参照。
+- Surface実機のCodex CLIへ開発を移管し、固定SSHラッパーからProxyCommandが開始されない原因を安全な内部診断で解決する。Fetch/Pushは実装・実行しない。
