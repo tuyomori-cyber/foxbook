@@ -4,12 +4,22 @@
 
 ## Now
 
-- Done: GNOME KeyringのLoginコレクションがGDM/PAMで自動解除されることをSurface再起動後に確認。
-- Done: 固定宛先・専用Agent・最小known_hosts・中継を統合した読み取り専用SSH接続試験を実装・回帰確認。
-- Done: Surfaceでfoxbookログイン後の専用Agent再生成・鍵自動登録が`ready`になることを確認。
-- Done: 終了未確認の安全停止解除、明示SSH URL化、専用Agent・直接`ls-remote`・中継事前試験をSurfaceで確認。
-- Pending: Focodex固定中継経路では`wrapper-command`後に中継未到達。実upstream読み取り専用試験は未成功。
+- Done: 履歴・定型の正本をNative Host固定パスへ保存し、Temporary Add-onの再読み込み後も復元できるようにした。
+- Done: 右ペインの履歴／定型／記号タブと、日本語JISの主要な全角／半角記号を含む外部ドラッグ追加を実装し、回帰試験が成功。
+- Done: FX-OSK連携（手入力フォーカスでの埋め込み表示、キー入力受信）を実装し、自動検証・パッケージ検査が成功。
+- Done: FX-OSKのキー寸法を埋め込みフレームの表示幅・高さへ追従させるよう修正。
+- Done: fox-voice-editorの2ペインを独立スクロールにし、右ペインのタブ列を固定。
+- Done: 閉じたFX-OSK iframeを非表示・タップ非受付にして、下側の操作を覆わないよう修正。
+- Done: Split Viewでの`pagehide`によるNative Hostの誤切断を廃止し、bfcache復帰時のみ必要なら再接続するよう修正。
+- Done: 手入力フォーカス時に欄を左ペイン中央へ寄せ、並べ替え・追加モードのボタンを黒地・白文字で強調。
+- Done: ブロック操作メニューを固定座標配置から、ブロック欄直下のsticky表示へ変更。
+- Done: 閉じたFX-OSK iframeを破棄し、プレビュー下の操作を覆わないよう変更。
+- Done: OSK初期化中の内部閉鎖通知ではiframeを破棄しないよう、開閉通知の開始順を修正。
+- Done: ブロック選択時の操作メニューを手入力欄の後からブロック欄直下へ移動。
+- Done: 並べ替え・追加モードの履歴ドラッグを、履歴を変更しない文書ブロック複製へ修正。
+- Done: fox-voice-editorの実装済み差分を仕様書v0.2.0へ統合し、関連文書の参照先を更新。
+- Done: 定型タブに複数選択・一括削除を追加し、現行仕様をv0.2.1へ更新。
 
 ## Next
 
-- Surface実機のCodex CLIへ開発を移管し、固定SSHラッパーからProxyCommandが開始されない原因を安全な内部診断で解決する。Fetch/Pushは実装・実行しない。
+- fox-voice-editor仕様書v0.2.1の実用テスト受け入れ条件に沿って、定型削除、Split View・OSK・録音／認識・保存・Focodex連携を確認する。

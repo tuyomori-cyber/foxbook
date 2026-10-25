@@ -1,14 +1,12 @@
 # Current State
 
-Updated: 1792816854
+Updated: 1792936034
 
 Now:
-- Done: focodexのmainとorigin/mainの競合を解消し、マージコミット1535e14を作成。
-- Done: Python回帰73件・拡張構文検査・差分形式検査が成功。
-- Done: Surface再起動後もKeyring解除、専用Agent再生成、固定鍵の自動登録が`ready`まで成功。
+- Done: 定型タブに複数選択・一括削除を追加し、現行仕様をv0.2.1へ更新。
 
 Next:
-- Surface実機のCodex CLIで、固定SSHラッパー後にProxyCommandが開始されない原因を調査する。
+- 仕様書v0.2.1の受け入れ条件に沿ってfox-voice-editorの実用テストを実施。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -16,9 +14,9 @@ Constraints:
 
 Relevant:
 - context: foxbook
-- repo: focodex
 - repo: fox-voice-editor
 - repo: foxbook-control
-- repo: specification
+- cwd: /home/tuyomori/project/fox-voice-editor
 - cwd: /home/tuyomori/project/foxbook-control
+- file: .context/session.md
 
