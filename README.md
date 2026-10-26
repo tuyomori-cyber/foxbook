@@ -1,97 +1,48 @@
-# Foxbook Control v0.1
+# Foxbook Control v0.2
 
-Firefoxの拡張ページから、ユーザー権限のNative Messaging Hostに固定アクションを送ります。`system_info`に加え、電池（`/sys/class/power_supply`）、ネットワーク（`nmcli device status`）、音量（`wpctl get-volume`）を表示できます。音量は0〜100%のスライダーで調整でき、スライダーを離した時に`wpctl set-volume`を1回実行します。電池がない端末ではその旨を表示します。ネットワーク表示にはNetworkManager、音量表示・変更にはWirePlumberの`wpctl`が必要です。Cage用のログアウトボタンは確認後に呼び出し元のログインセッションを終了します。
+Firefoxの拡張ページから、ユーザー権限のNative Messaging Hostへ固定操作だけを送る端末制御コンポーネントです。任意コマンドや任意パスを受け付けず、拡張はUI、Native Hostは入力検証と固定コマンド実行を担当します。
 
-「Dropboxから楽譜を同期」は、Hostを実行しているユーザーの`~/bin/sync-score.sh`だけを起動します。スクリプトに実行権限が必要です。同期中はボタンを無効にし、完了または失敗を画面に表示します。同期の待機上限は15分です。
+現行の実装仕様は[仕様書 v0.2](specification/foxbook-control仕様書v0.2.md)、未完了事項は[TODO](TODO.md)、Foxbook全体との関係は[横断管理台帳](../foxbook/docs/repositories/foxbook-control.md)を参照してください。旧文書は[old/](old/)に保管しています。
 
-輝度も音量と同じく、画面を開いたときに現在値を取得し、スライダーを離したときに1回変更します。調整範囲は1〜100%です。「輝度」ボタンで現在値を再取得できます。Hostは`brightness_status`で`/usr/bin/brightnessctl --machine-readable --class=backlight info`、`set_brightness`で同じオプションの`set 整数%`を実行し、変更後の実際の値を表示します。LEDは対象にせず、最初に見つかるバックライトを使用します。
+## 提供する操作
 
-輝度の取得・変更には[`brightnessctl`](https://github.com/Hummer12007/brightnessctl)とバックライト対応デバイスが必要です。Fedoraは`sudo dnf install brightnessctl`、Xubuntuは`sudo apt install brightnessctl`で導入できます。実行ユーザーにバックライト変更権限が必要です。Hostから権限昇格は行いません。Surfaceへの反映はリポジトリを更新し、「Hostを更新」を押してから、`about:debugging`で拡張を再読み込みし、制御ページを開き直してください。取得できない場合、輝度スライダーは無効のままエラーを表示します。
+| 分類 | 操作 |
+| --- | --- |
+| 状態取得 | システム情報、電池、ネットワーク、音量、輝度、画面の向き |
+| 変更 | 音量、輝度、画面回転 |
+| 運用 | Native Host更新、Dropbox楽譜同期、Cageログアウト |
 
-2026-10-18にSurface実機で輝度スライダーによる輝度調整の動作を確認済みです（ユーザーによる実機確認）。
+音量と輝度はスライダーを離した時だけ変更します。回転は`eDP-1`の`normal`と`90`だけを対象とし、変更前後で状態を確認します。
 
-## 画面回転（Cage / Surface）
+## 導入と更新
 
-「画面の向き」に現在の縦横と切替ボタンを表示します。既存と同じFirefox Native MessagingでHostへ`rotation_status`または`toggle_rotation`を送り、Hostが固定の`/usr/bin/wlr-randr`を実行します。追加の通信サーバーは不要です。`wlr-randr`が必要です。
-
-このワークスペースのCageは`wlr_output_manager_v1`を作成し、出力変更時に設定を通知しています（`../cage/cage.c`、`../cage/output.c`）。wlrootsは現在の`output->transform`を公開しています。Cage独自のHTTP APIは必要なく、[wlr-randrの実装](https://github.com/emersion/wlr-randr/blob/master/main.c)がこのWaylandプロトコルを読み取り、引数なしで`Transform: normal`などを表示します。
-
-Hostはユーザー確認済みの接続先に合わせ、`XDG_RUNTIME_DIR=/run/user/<実行ユーザーUID>`と`WAYLAND_DISPLAY=wayland-0`を設定します。シェルは使用しません。対象は`eDP-1`固定で、横画面は`normal`、縦画面は`90`です。クリックごとに現在の向きを再取得してから、`--output eDP-1 --transform 90`または`--output eDP-1 --transform normal`を実行し、変更後も再取得して一致を確認します。外部から向きが変更されても、前回の表示値だけで切り替えません。
-
-対象出力がない・無効・向きを取得できない・`normal`と`90`以外の場合は切替を実行しません。取得・変更・確認に失敗した場合は向きを未取得に戻して回転ボタンを無効にします。「向きを再取得」で取得できると再び有効になります。
-
-Surfaceへの反映は、リポジトリを更新 → 制御ページの「Hostを更新」 → `about:debugging`で拡張を再読み込み → 制御ページを開き直す、の順です。2026-10-19に、ユーザーがSurface実機で追加ボタン経由の画面回転を確認済みです。
-
-## Xubuntu 24.04での検証
-
-1. [Mozilla公式のLinux版Firefox](https://support.mozilla.org/ja/kb/install-firefox-linux)を取得し、配布物のディレクトリ構造を保って`~/.local/opt/foxbook-firefox/`に配置します。`~/.local/opt/foxbook-firefox/firefox`が実行ファイルとなるようにします。既存のSnap版には触れません。
-2. リポジトリのルートでHostを登録します。
-
-   ```sh
-   python3 scripts/install_host.py --firefox "$HOME/.local/opt/foxbook-firefox/firefox"
-   ```
-
-3. 検証用Firefoxを専用プロファイルで起動します。
-
-   ```sh
-   ./scripts/run_dev_firefox.sh
-   ```
-
-4. そのFirefoxの`about:debugging`で「この Firefox」→「一時的なアドオンを読み込む」を選び、`extension/manifest.json`を指定します。拡張アクションを押すと制御ページが新しいタブで開きます。ボタンがツールバーに見えない場合は拡張メニューから表示・ピン留めします。一時読み込みはFirefox再起動後にやり直します。
-
-初回のHost登録後は、制御ページの「Hostを更新」から更新元リポジトリのHostを再配置できます。インストーラーは使用したインストーラーとFirefoxの絶対パスを`~/.local/share/foxbook-control/install_source.json`へ記録します。更新元リポジトリを移動・削除した場合は、端末からインストーラーを再実行して記録を更新してください。既存のHostには更新操作がないため、この機能を導入する際は一度だけ手順2を端末で実行します。拡張側を変更した場合は`about:debugging`から再読み込みしてください。
-
-2026-10-14にXubuntuのFirefox画面でP3の電池・ネットワーク・音量を確認済みです。音量とネットワークは取得結果を表示し、このXubuntu環境の電池は「バッテリーが見つかりません。」と表示されました。
-
-共通インストーラーは、指定FirefoxがSnap／Flatpak版または導入形態を判定できない場合、ファイルを変更せずに終了します。`--firefox`は検査対象であり、Host登録をそのFirefoxだけに限定するものではありません。
-
-## Fedora実機
-
-同じインストーラーをRPM版Firefoxで実行します。Fedoraではリポジトリが`~/foxbook-control`にある場合、先にそのディレクトリへ移動してください。Xubuntu用の`~/.local/opt/foxbook-firefox/firefox`ではなく、RPM版の`/usr/bin/firefox`を指定します。2026-10-14にFedora KDE PlasmaとFedora Cageで既存MVPの実機確認は両方成功しました。P3の状態取得はXubuntuで確認済みで、Fedoraでの確認はこれからです。
+対象はMozilla公式展開版、または通常のRPM／DEB版Firefoxです。Snap／Flatpak版はNative Messaging Host登録の対象外です。
 
 ```sh
-cd "$HOME/foxbook-control"
-grep -n 'update_host\|cage_logout' native_host/foxbook_control.py
-python3 scripts/install_host.py --firefox /usr/bin/firefox
+python3 scripts/install_host.py --firefox /absolute/path/to/firefox
 ```
 
-`grep`に両方の操作が出なければ、Fedora側のリポジトリを更新してからインストーラーを実行してください。
+拡張は開発中は`about:debugging`から`extension/manifest.json`を一時読み込みします。初回登録後、制御ページの「Hostを更新」は保存済みのインストーラーとFirefoxパスを使ってHostを再配置します。拡張側を変更した場合は`about:debugging`から再読み込みします。
 
-Cageの`~/.local/bin/firefox-kiosk-app`では、スケール・回転・センサー設定を維持し、最後のFirefox起動行を次にします。2026-10-14にCageでFirefoxとデバッグ画面が起動することを確認しました。「この Firefox」から`manifest.json`を一時読み込みすれば、SSHなしで画面上から拡張を検証できます。Firefoxの再起動後は再読み込みが必要です。
+## 環境依存の操作
 
-```sh
-exec firefox --no-remote --new-instance about:debugging
-```
+- 電池：`/sys/class/power_supply`のBattery種別だけを読む。
+- ネットワーク：NetworkManagerの`nmcli`が必要。
+- 音量：WirePlumberの`wpctl`が必要。
+- 輝度：`brightnessctl`とバックライト変更権限が必要。Hostは権限昇格しない。
+- 回転：Cage／Wayland環境の`wlr-randr`が必要。
+- Cageログアウト：`FOXBOOK_CAGE_SESSION=1`がある場合だけ実行する。
+- 楽譜同期：`~/bin/sync-score.sh`が実行可能である必要がある。待機上限は15分。
 
-ログアウト機能を使う場合は同じスクリプトでFirefox起動行の直前に`export FOXBOOK_CAGE_SESSION=1`を追加します。この印がない環境ではHostがログアウト操作を拒否します。Fedoraでも初回と更新ボタン導入時は上記のインストーラーを端末で実行し、その後は制御ページからHostを更新できます。更新元リポジトリはFedora上にも必要です。
+## Split View
 
-音量スライダーの追加後に`INVALID_REQUEST`が出る場合は、Surface上で`cd "$HOME/foxbook-control" && git pull`を実行し、制御ページの「Hostを更新」を押してください。初回登録が済んでいれば、端末からインストーラーを再実行する必要はありません。拡張も変更されているため、`about:debugging`で再読み込みしてから制御ページを開き直します。更新元の記録がない場合だけ、上記のインストーラーを再実行してください。
+Split ViewのAutoConfigは[foxbook-firefox](../foxbook-firefox/README.md)が正本です。横断上の契約は[`IF-SV-001`](../foxbook/docs/interfaces/split-view-operation.md)を参照してください。このリポジトリの`experiments/splitview-autoconfig/`は移設前の実験コードです。
 
-楽譜同期ボタンをSurfaceに反映する場合も、Surfaceでリポジトリを更新し、「Hostを更新」を押してから`about:debugging`で拡張を再読み込みします。`UNKNOWN_ACTION`と表示される場合は、SurfaceのHostがまだ古い状態です。`~/bin/sync-score.sh`がない場合や実行権限がない場合も画面にエラーを表示します。
-
-現在の`sync-score.sh`は`rclone sync`が失敗しても、後続の`notify-send`が成功すると終了コード0を返します。画面に正しい同期結果を表示するため、Surface上のスクリプトの`if`部分を次の形にしてください。通知できない環境でも同期の成否は正しく返します。
-
-```bash
-if rclone sync dropbox:score "$HOME/score" \
-  --include '**/*.pdf' \
-  --include '*.pdf'
-then
-    notify-send "Score Sync" "楽譜PDFの同期が完了しました" || true
-    exit 0
-else
-    notify-send -u critical "Score Sync" "楽譜PDFの同期に失敗しました" || true
-    exit 1
-fi
-```
-
-Hostの`cage_logout`は固定コマンド`loginctl --no-ask-password terminate-session ""`を実行します。空文字のIDはコマンドを呼び出したログインセッションを指すため、Cageから呼んだ場合はCageのセッションを終了し、別のSSHセッションは対象にしません。2026-10-14にFedora Cageでログアウト成功を確認しました。[systemdのloginctlマニュアル](https://www.freedesktop.org/software/systemd/man/latest/loginctl.html)
-
-
-## 単体テスト
+## テスト
 
 ```sh
 python3 -m unittest discover -s tests -v
 node --test tests/test_control.cjs
 ```
 
-テストはモックを使い、システム操作を実行しません。
+Python単体試験はNative Hostとインストーラーを、JavaScript試験は音量・輝度・回転UIの6シナリオをモックで検証します。テストは実際のシステム操作を行いません。
