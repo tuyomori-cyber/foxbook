@@ -9,6 +9,13 @@ updated: 2026-10-26
 
 - 音声、手入力、定型、記号を文章ブロックとして編集する。
 
+## 正本へのリンク
+
+- [README](../../../fox-voice-editor/README.md)
+- [現行仕様 v0.3](../../../fox-voice-editor/specification/fox-voice-editor仕様書v0.3.md)
+- [TODO](../../../fox-voice-editor/TODO.md)
+- [旧文書](../../../fox-voice-editor/old/specification/)
+
 ## 参加インターフェース
 
 | 契約ID | 相手 | 役割 | 状態 | 正本 |

@@ -4,10 +4,10 @@
 
 ## Now
 
-- Done: Foxbook横断の共有コンテキストを`foxbook/.context`へ移設し、関連リポジトリのllmctx設定を同じ保存先へ切り替えた。
-- Done: 横断管理台帳の雛形と契約ID索引を作成し、foxbook-controlの文書を実装ベースのv0.2へ更新した。
-- Done: Firefox-On-Screen-Keyboardの旧文書をold/へ履歴化し、実装ベースの現行文書v0.2、OSK連携契約、検証状態を整備した。
+- Done: 対象6リポジトリ（foxbook-control、Firefox-On-Screen-Keyboard、fox-voice-editor、focodex、cage、foxbook-firefox）の棚卸しと、実装ベースの現行文書整備を完了した。
+- Done: 横断台帳、連携契約、検証マトリクス、実際の3台構成の環境台帳を更新した。
 
 ## Next
 
-- foxbook-firefoxを次の対象として、現行文書と実装を照合し、旧文書を履歴化して現行文書を整備する。
+- 各リポジトリの未コミット文書変更を確認し、レビュー・コミット単位を決める。
+- 次回の実機検証時に、各開発機のFirefox導入形態・バージョンと横断検証結果を環境台帳・検証マトリクスへ記録する。

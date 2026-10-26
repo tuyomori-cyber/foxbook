@@ -4,6 +4,6 @@
 
 | 環境 | 役割 | OS／Firefox | 導入対象 | 備考 |
 | --- | --- | --- | --- | --- |
-| 開発機A | [記入] | [記入] | [記入] | [記入] |
-| 開発機B | [記入] | [記入] | [記入] | [記入] |
-| Surface | 実機受け入れ | [記入] | [記入] | [記入] |
+| Xubuntuデスクトップ | 開発 | Xubuntu / Firefox（導入形態・版は検証時に記録） | Foxbook関連リポジトリ | 実機検証と混同しない。 |
+| Xubuntuノート | 開発 | Xubuntu / Firefox（導入形態・版は検証時に記録） | Foxbook関連リポジトリ | 実機検証と混同しない。 |
+| Surface Fedora | 開発・実機検証 | Fedora 43 / GDM・Cage・Firefox | Foxbook全体 | Firefoxのパッケージ形態・版は次回の実機検証時に記録する。 |

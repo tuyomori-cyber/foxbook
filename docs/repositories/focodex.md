@@ -9,6 +9,13 @@ updated: 2026-10-26
 
 - Codex実行、Git操作、fox-voice-editorから受け取る文章のFIFO受信バッファを提供する。
 
+## 正本へのリンク
+
+- [README](../../../focodex/README.md)
+- [現行仕様 v0.2](../../../focodex/specification/focodex仕様書v0.2.md)
+- [TODO](../../../focodex/TODO.md)
+- [専用SSH Agent運用](../../../focodex/docs/dedicated-ssh-agent-operations.md)
+
 ## 参加インターフェース
 
 | 契約ID | 相手 | 役割 | 状態 | 正本 |
