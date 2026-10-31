@@ -18,10 +18,14 @@
 | `focodex` | Codex実行、Git操作、文章受信バッファ | [管理文書](repositories/focodex.md) |
 | `Firefox-On-Screen-Keyboard` | fox-voice-editor向け埋め込みOSK | [管理文書](repositories/firefox-on-screen-keyboard.md) |
 | `cage` | Foxbook運用時のCage側変更 | [管理文書](repositories/cage.md) |
+| `lato` | ローカルMarkdownのタッチ閲覧用Firefox拡張 | [管理文書](repositories/lato.md) |
 
 ## インターフェース索引
 
 契約ID、状態、正本は[interfaces/index.md](interfaces/index.md)を参照する。
+Split View片側の汎用タブ切替案`IF-SV-002`は見送り・クローズ。Firefox 158.0.1の`replaceTab`に関する調査記録は保持するが、代替方式の調査・実装は進めない。
+今後は独立したローカルMarkdownビューアーを別タブとして実装し、Firefoxの垂直タブで既存Split Viewと切り替える運用を目指す。ビューアーの保存場所・設計・ローカル読取方式とSurface実機での操作性は未決定・未検証。
+Focodexの回答を読み取り専用の別画面へ共有し、Markdownビューアーと並べる案は2026-10-30に見送り・クローズした。実装や新しい連携契約はない。回答と仕様書を同時に確認したい要望の実現方式は未決定。
 
 ## 運用・検証
 

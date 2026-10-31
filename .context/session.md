@@ -1,13 +1,12 @@
 # Current State
 
-Updated: 1793001158
+Updated: 1793439006
 
 Now:
-- Done: 共有正本のroot-todoを、完了済み棚卸しと現在の残作業へ整合させた。
+- Done: FocodexのGit変更一覧に行右端のステージ選択と全件選択・解除を実装し、自動試験を通過。
 
 Next:
-- foxbook-firefoxの実装・文書整合を確認する。
-- ->
+- 更新HostをFirefoxへ導入し、既存の操作診断を実機確認する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -15,9 +14,9 @@ Constraints:
 
 Relevant:
 - context: foxbook
-- repo: Firefox-On-Screen-Keyboard
-- repo: cage
 - repo: focodex
-- repo: fox-voice-editor
 - repo: foxbook
+- repo: foxbook-control
+- cwd: /home/tuyomori/project/foxbook-control
+- file: .context/session.md
 
