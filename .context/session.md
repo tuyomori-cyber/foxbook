@@ -1,12 +1,13 @@
 # Current State
 
-Updated: 1793443784
+Updated: 1793456759
 
 Now:
-- Done: FocodexのGit変更一覧に行右端のステージ選択と全件選択・解除を実装し、自動試験を通過。
+- Done: Focodex仕様書v0.2.1を作成し、表示名称を「Focodex」に変更。
+- Pending: Firefoxで再読み込み後の表示名称を確認。
 
 Next:
-- 更新HostをFirefoxへ導入し、既存の操作診断を実機確認する。
+- テストレコーダー仕様案の未決定事項を検討する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -16,10 +17,7 @@ Relevant:
 - context: focodex
 - context: fox-voice-editor
 - context: foxbook
+- repo: device_test
 - repo: focodex
 - repo: fox-voice-editor
-- repo: foxbook
-- repo: foxbook-control
-- cwd: /home/tuyomori/project/foxbook-control
-- file: .context/session.md
 
