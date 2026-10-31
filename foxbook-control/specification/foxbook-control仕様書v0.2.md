@@ -69,8 +69,8 @@ Host本体、更新元情報、Native Messaging定義は一時ファイル・fsy
 
 ## 7. 横断関係
 
-Cageとの回転・ログアウト境界は[`IF-CTL-CAGE-001`](../../foxbook/docs/interfaces/foxbook-control--cage.md)を参照する。Split Viewは`foxbook-firefox`の責務であり、[`IF-SV-001`](../../foxbook/docs/interfaces/split-view-operation.md)を参照する。
+Cageとの回転・ログアウト境界は[`IF-CTL-CAGE-001`](../../docs/interfaces/foxbook-control--cage.md)を参照する。Split Viewは`foxbook-firefox`の責務であり、[`IF-SV-001`](../../docs/interfaces/split-view-operation.md)を参照する。
 
 ## 8. 検証
 
-Python単体試験はHostの入力検証、固定コマンド、タイムアウト、同期の子プロセス終了、インストーラーの原子的更新を検証する。JavaScript試験は音量・輝度・回転のUI状態遷移を検証する。実機確認と未確認範囲はFoxbookの[検証マトリクス](../../foxbook/docs/operations/verification-matrix.md)へ記録する。
+Python単体試験はHostの入力検証、固定コマンド、タイムアウト、同期の子プロセス終了、インストーラーの原子的更新を検証する。JavaScript試験は音量・輝度・回転のUI状態遷移を検証する。実機確認と未確認範囲はFoxbookの[検証マトリクス](../../docs/operations/verification-matrix.md)へ記録する。

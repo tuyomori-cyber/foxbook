@@ -20,11 +20,11 @@
 
 ## 対象外・横断事項
 
-- Split ViewのAutoConfigは`foxbook-firefox`が正本であり、ここでは管理しない。横断契約は[`IF-SV-001`](../foxbook/docs/interfaces/split-view-operation.md)を参照する。
-- Cageとの画面回転・ログアウトの境界は[`IF-CTL-CAGE-001`](../foxbook/docs/interfaces/foxbook-control--cage.md)を参照する。
+- Split ViewのAutoConfigは`foxbook-firefox`が正本であり、ここでは管理しない。横断契約は[`IF-SV-001`](../docs/interfaces/split-view-operation.md)を参照する。
+- Cageとの画面回転・ログアウトの境界は[`IF-CTL-CAGE-001`](../docs/interfaces/foxbook-control--cage.md)を参照する。
 
 ## 参照
 
 - 現行実装仕様：[仕様書 v0.2](specification/foxbook-control仕様書v0.2.md)
-- 横断管理：[foxbook-control管理文書](../foxbook/docs/repositories/foxbook-control.md)
+- 横断管理：[foxbook-control管理文書](../docs/repositories/foxbook-control.md)
 - 旧文書：[old/](old/)

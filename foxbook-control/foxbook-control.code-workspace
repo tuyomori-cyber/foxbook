@@ -25,10 +25,10 @@
 			"path": "../git-test"
 		},
 		{
-			"path": "../foxbook-firefox"
+			"path": "../../foxbook-firefox"
 		},
 		{
-			"path": "../foxbook"
+			"path": ".."
 		},
 		{
 			"path": "../setoli"

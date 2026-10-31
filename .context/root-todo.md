@@ -4,9 +4,9 @@
 
 ## Now
 
-- Done: Focodexのモデル一覧・Codex実行について、内容を保存しない操作診断トレースを実装し、自動試験で確認した。
-- Pending: 更新したNative Hostを再登録し、Firefox実機で追跡IDと診断ログを確認する。
+- Done: foxbook-controlをfoxbook/foxbook-controlへ履歴付きで統合し、相対参照を修正して自動試験を通過した。
+- Pending: 統合済みmainをoriginへ公開するか決定する。
 
 ## Next
 
-- Focodexの更新HostをFirefoxへ導入し、正常取得・失敗時の追跡ID表示を実機検証する。
+- 公開する場合は、統合コミットをorigin/mainへpushする。
