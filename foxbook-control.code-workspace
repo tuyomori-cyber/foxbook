@@ -35,6 +35,9 @@
 		},
 		{
 			"path": "../lato"
+		},
+		{
+			"path": "../auto-shooter"
 		}
 	]
 }
