@@ -8,3 +8,5 @@
 | voice-editor → OSK | `IF-VE-OSK-001` | bridge試験2件、OSK ZIP生成・10ファイル内容確認済み | 未実施 | 2026-10-26 | Firefox実画面での埋め込み、文字入力、削除、Enter、閉鎖後の再表示。Surfaceの高DPI・回転。 |
 | control → Cage | `IF-CTL-CAGE-001` | コード差分確認済み | 未実施 | 2026-10-26 | Cageビルド、Surface単一出力での各回転角のtouch down／drag、`wlr-randr`経由の連携。 |
 | Split View・開発用拡張読込 | `IF-SV-001` | AutoConfig・導入／削除スクリプト構文確認済み | Surface Fedora / Firefox 157.0.1: 静的合成AutoConfigの起動、スライダー表示・比率反映、foxbook-control一時拡張の自動読込・Reload操作を確認 | 2026-10-27 | タッチ操作、保存・再起動復元、ツールバー再配置、開発用読込解除、Firefox更新後の自己診断。Reload後の拡張ページ自動再表示は未実装。 |
+| Split View片側タブ切替 | `IF-SV-002`（見送り・クローズ） | 未実装・試験未実施。開発機Firefox 158.0.1の同梱実装の静的確認のみ。 | 未実施 | 2026-10-30（静的調査） | 片側タブ切替の検証は実施しない。 |
+| 垂直タブによる運用 | 既存Split Viewと独立Markdownビューアータブの切替構想 | 未実施 | 未実施 | — | Surfaceで垂直タブ操作と画面幅、非表示中のvoice-editor・Focodexの状態保持。ビューアーは未設計・未実装。 |

@@ -4,9 +4,9 @@
 
 ## Now
 
-- Done: fox-voice-editorの固定記号へ、。の直後に空白と改行を追加した。
-- Pending: Firefoxで記号カードの表示と末尾ブロックへの追加を確認する。
+- Done: Focodexのモデル一覧・Codex実行について、内容を保存しない操作診断トレースを実装し、自動試験で確認した。
+- Pending: 更新したNative Hostを再登録し、Firefox実機で追跡IDと診断ログを確認する。
 
 ## Next
 
-- 記号カードから空白・改行を追加した時のプレビューとコピー結果を確認する。
+- Focodexの更新HostをFirefoxへ導入し、正常取得・失敗時の追跡ID表示を実機検証する。

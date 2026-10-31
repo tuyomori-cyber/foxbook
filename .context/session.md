@@ -1,14 +1,12 @@
 # Current State
 
-Updated: 1793362363
+Updated: 1793439006
 
 Now:
-- Done: 同じHostが専用プロセス群の終了未確認として再実行を拒否していることを確認。
-- Done: モデル一覧取得の記録が残り、再取得時に一覧が消える挙動と整合。
-- Pending: 終了確認時にプロセス群が残った直接原因は未確定。
+- Done: FocodexのGit変更一覧に行右端のステージ選択と全件選択・解除を実装し、自動試験を通過。
 
 Next:
-- 強制終了後の確認タイミングと終了診断の不足を改善・検証する。
+- 更新HostをFirefoxへ導入し、既存の操作診断を実機確認する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -20,5 +18,8 @@ Relevant:
 - context: foxbook
 - repo: focodex
 - repo: fox-voice-editor
+- repo: foxbook
 - repo: foxbook-control
+- cwd: /home/tuyomori/project/foxbook-control
+- file: .context/session.md
 
