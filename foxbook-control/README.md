@@ -2,7 +2,7 @@
 
 Firefoxの拡張ページから、ユーザー権限のNative Messaging Hostへ固定操作だけを送る端末制御コンポーネントです。任意コマンドや任意パスを受け付けず、拡張はUI、Native Hostは入力検証と固定コマンド実行を担当します。
 
-現行の実装仕様は[仕様書 v0.2](specification/foxbook-control仕様書v0.2.md)、未完了事項は[TODO](TODO.md)、Foxbook全体との関係は[横断管理台帳](../docs/repositories/foxbook-control.md)を参照してください。旧文書は[old/](old/)に保管しています。
+現行の実装仕様は[仕様書 v0.2](specification/foxbook-control仕様書v0.2.md)、未完了事項は[TODO](TODO.md)、Foxbook全体との関係は[横断管理台帳](../foxbook/docs/repositories/foxbook-control.md)を参照してください。旧文書は[old/](old/)に保管しています。
 
 ## 提供する操作
 
@@ -36,7 +36,7 @@ python3 scripts/install_host.py --firefox /absolute/path/to/firefox
 
 ## Split View
 
-Split ViewのAutoConfigは[foxbook-firefox](../../foxbook-firefox/README.md)が正本です。横断上の契約は[`IF-SV-001`](../docs/interfaces/split-view-operation.md)を参照してください。このリポジトリの`experiments/splitview-autoconfig/`は移設前の実験コードです。
+Split ViewのAutoConfigは[foxbook-firefox](../foxbook-firefox/README.md)が正本です。横断上の契約は[`IF-SV-001`](../foxbook/docs/interfaces/split-view-operation.md)を参照してください。このリポジトリの`experiments/splitview-autoconfig/`は移設前の実験コードです。
 
 ## テスト
 

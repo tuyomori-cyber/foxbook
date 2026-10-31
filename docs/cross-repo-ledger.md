@@ -12,7 +12,7 @@
 
 | リポジトリ | 主な責務 | 管理文書 |
 | --- | --- | --- |
-| `foxbook/foxbook-control` | 端末制御用Firefox拡張とNative Host（foxbookへ統合済み） | [管理文書](repositories/foxbook-control.md) |
+| `foxbook-control` | 端末制御用Firefox拡張とNative Host | [管理文書](repositories/foxbook-control.md) |
 | `foxbook-firefox` | Firefox Split View用AutoConfig | [管理文書](repositories/foxbook-firefox.md) |
 | `fox-voice-editor` | 音声・手入力による文章編集 | [管理文書](repositories/fox-voice-editor.md) |
 | `focodex` | Codex実行、Git操作、文章受信バッファ | [管理文書](repositories/focodex.md) |
@@ -35,7 +35,6 @@ Focodexの回答を読み取り専用の別画面へ共有し、Markdownビュ�
 
 ## 直近の横断運用変更
 
-- 2026-10-31: `foxbook-control` を `foxbook/foxbook-control/` へ履歴付きで統合した。実装・仕様書・TODOは同ディレクトリを正本とし、共有コンテキストと横断文書はリポジトリ直下の`.context/`・`docs/`を参照する。
 - 2026-10-29: `foxbook-firefox` の開発用再読込ボタンが表示されない報告を受け、登録判定とアイコンを修正した。更新時はFirefox終了後、登録済み拡張を一つ指定して `install-dev-addon.sh` を再実行し、合成AutoConfigを更新する。Surfaceでの表示・操作は未確認。
 - 2026-10-29: `foxbook-firefox` に `scripts/list-dev-addons.sh` を追加した。`foxbook-control` などの開発用一時拡張について、root管理の登録表を変更せず、登録済みの拡張IDと開発元を `ADDON_ID<TAB>SOURCE_DIR` 形式で確認できる。登録表が不安全な権限・所有者・形式なら読込前に拒否する。
 - 2026-10-27: `foxbook-firefox` は、Surface実機で起動エラーになった実行時AutoConfig外部読込を廃止した。`foxbook-control` などの開発用拡張の登録手順・ID・登録表は変えず、登録時にSplit Viewと読込器を単一の主AutoConfigへ静的合成する方式に変更した。Surface実機での合成版再導入とfoxbook-controlの一時読込を確認した。Reload操作は狭い画面でオーバーフローメニューへ入ること、拡張ページは再読込時に閉じることを共有運用とする。

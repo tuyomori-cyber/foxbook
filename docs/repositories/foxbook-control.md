@@ -1,6 +1,6 @@
 ---
 repository: foxbook-control
-updated: 2026-10-31
+updated: 2026-10-26
 ---
 
 # foxbook-control 横断管理
@@ -17,10 +17,10 @@ updated: 2026-10-31
 
 ## 正本へのリンク
 
-- [README](../../foxbook-control/README.md)
-- [現行仕様 v0.2](../../foxbook-control/specification/foxbook-control仕様書v0.2.md)
-- [TODO](../../foxbook-control/TODO.md)
-- [旧文書](../../foxbook-control/old/)
+- [README](../../../foxbook-control/README.md)
+- [現行仕様 v0.2](../../../foxbook-control/specification/foxbook-control仕様書v0.2.md)
+- [TODO](../../../foxbook-control/TODO.md)
+- [旧文書](../../../foxbook-control/old/)
 
 ## 変更時の影響確認
 
