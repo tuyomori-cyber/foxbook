@@ -1,13 +1,14 @@
 # Current State
 
-Updated: 1793456759
+Updated: 1793493750
 
 Now:
-- Done: Focodex仕様書v0.2.1を作成し、表示名称を「Focodex」に変更。
-- Pending: Firefoxで再読み込み後の表示名称を確認。
+- Done: 操作端末の設定ファイルにSSH接続名とSurface上の監視スクリプトパスを設定し、短縮コマンドを実装した。
+- Pending: 短縮コマンドとプロセス要約を含む更新版をSurfaceで確認する。
 
 Next:
-- テストレコーダー仕様案の未決定事項を検討する。
+- 更新版で短いケースを再実行後、タイムアウト・SSH切断／再接続を検証する。
+- ->
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
