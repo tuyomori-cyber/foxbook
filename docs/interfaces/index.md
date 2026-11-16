@@ -7,6 +7,7 @@
 | `IF-VE-FD-001` | fox-voice-editor → focodex | active | [契約](fox-voice-editor--focodex.md) |
 | `IF-VE-FD-002` | fox-voice-editor → focodex | active | [契約](fox-voice-editor--focodex.md) |
 | `IF-VE-OSK-001` | fox-voice-editor → Firefox-On-Screen-Keyboard | active | [契約](fox-voice-editor--firefox-on-screen-keyboard.md) |
+| `IF-VE-SP-001` | fox-voice-editor → foxbook-speech | draft | [契約](fox-voice-editor--foxbook-speech.md) |
 | `IF-CTL-CAGE-001` | foxbook-control → cage | active | [契約](foxbook-control--cage.md) |
 | `IF-SV-001` | foxbook-firefox、fox-voice-editor、focodex | experimental | [契約](split-view-operation.md) |
 | `IF-SV-002` | foxbook-firefox、Split View利用者 | closed | [検討記録](split-view-operation.md) |

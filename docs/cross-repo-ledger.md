@@ -15,6 +15,7 @@
 | `foxbook-control` | 端末制御用Firefox拡張とNative Host | [管理文書](repositories/foxbook-control.md) |
 | `foxbook-firefox` | Firefox Split View用AutoConfig | [管理文書](repositories/foxbook-firefox.md) |
 | `fox-voice-editor` | 音声・手入力による文章編集 | [管理文書](repositories/fox-voice-editor.md) |
+| `foxbook-speech` | 共有のローカル音声認識Host・音声service | [管理文書](repositories/foxbook-speech.md) |
 | `focodex` | Codex実行、Git操作、文章受信バッファ | [管理文書](repositories/focodex.md) |
 | `Firefox-On-Screen-Keyboard` | fox-voice-editor向け埋め込みOSK | [管理文書](repositories/firefox-on-screen-keyboard.md) |
 | `cage` | Foxbook運用時のCage側変更 | [管理文書](repositories/cage.md) |
@@ -34,6 +35,34 @@ Focodexの回答を読み取り専用の別画面へ共有し、Markdownビュ�
 - [設計判断](decisions/)
 
 ## 直近の横断運用変更
+
+- 2026-11-16: 待機中の二Port切断・復旧と内部状態表示をFirefox実機で確認した。録音中のライブラリHost切断では録音停止ボタンが無効でも録音が続き、手動キャンセル後に`arecord`は終了したがReazonSpeech Workerは5分以上残存した。`foxbook-speech`の取消時Worker解放漏れと、Voice Editorの録音・認識中のライブラリ切断時の扱いは未修正。詳細と次の検証は各リポジトリの`TODO.md`を参照。
+
+- 2026-11-16: Voice Editorで音声service停止中の手入力・保存継続と復旧、ライブラリHost切断時の編集・録音抑止と再読込による復旧を実機確認した。内部状態には音声とライブラリの状態を別々に表示する変更を追加した（表示変更のFirefox確認は未実施）。録音・認識中の切断は未確認。
+
+- 2026-11-16: `foxbook-speech` を新設し、音声認識のNative Messaging Host、録音・認識・マイク排他を担う単一service、共通APIの所有先とした。最初の利用者はfox-voice-editorであり、`IF-VE-SP-001`はdraftで未実装。既存の`fox_voice_editor` Hostは移行後に編集データの保存・読込だけを担う。
+
+- 2026-11-16: `foxbook-speech` のWhisper経路を、録音・WAV変換・CLI認識・取消・一時ファイル回収まで単一serviceへ接続した。socket経由の所有権、録音リース、`stopping → converting → recognizing → result`の順序を擬似コマンドによる自動試験で確認した。systemd --user unit templateと導入スクリプトも追加した。`IF-VE-SP-001`は引き続きdraftで、実機起動・録音、ReazonSpeech、Voice Editorの二Port移行は未完了である。
+
+- 2026-11-16: `foxbook-speech` を実機 `tuyomori-IStDXi-M1B6` でsystemd --user serviceとして起動し、ユーザー専用0600 socketと`foxbook_speech` Native Messaging manifestを確認した。実マイクの録音・認識とFirefox経由の確認は、追加したsocket診断クライアントとVoice Editor移行後に行う。
+
+- 2026-11-16: `foxbook-speech` のsocket診断クライアントで、実機 `tuyomori-IStDXi-M1B6` の5秒録音からWAV変換、Whisper認識、結果返却までを確認した。変換86ms、モデル準備219ms、認識1121msだった。Firefox経由の接続とVoice Editor二Port移行は未確認である。
+
+- 2026-11-16: `foxbook-speech` の実機診断で、`elapsedMs`を含む全計測値の返却を確認した。5秒録音で変換101ms、モデル準備129ms、認識1317ms、停止から結果まで1581msだった。service単体の実機検証は完了し、Firefox経由の接続とVoice Editor二Port移行は未確認である。
+
+- 2026-11-16: `foxbook-speech` にReazonSpeech K2の共有Workerを追加した。Workerは全serviceで一つだけを再利用し、取消時は破棄、最終利用から5分で解放する。`IF-VE-SP-001`の実機ReazonSpeech確認とVoice Editor二Port移行は未完了である。
+
+- 2026-11-16: `foxbook-speech` のReazonSpeech K2を実機 `tuyomori-IStDXi-M1B6` で確認した。5秒録音で変換100ms、認識170ms、停止から結果まで276ms、Worker世代1で結果を返した。Worker再利用・アイドル解放、Firefox経由の接続、Voice Editor二Port移行は未確認である。
+
+- 2026-11-16: `foxbook-speech` のReazonSpeech K2を連続実行し、2回目もWorker世代1のまま認識171ms、停止から結果まで313msで結果を返すことを確認した。Worker再利用の実機確認は完了し、5分アイドル解放、Firefox経由の接続、Voice Editor二Port移行は未確認である。
+
+- 2026-11-16: `foxbook-speech` のReazonSpeech K2を5分以上アイドルにした後、Worker世代2へ再生成され、認識160ms、停止から結果まで264msで結果を返すことを確認した。Worker再利用とアイドル解放の実機検証は完了し、Firefox経由の接続とVoice Editor二Port移行は未確認である。
+
+- 2026-11-16: `fox-voice-editor` を二つのNative Messaging Portへ分離した。`foxbook_speech`はAPI v1の音声操作だけ、`fox_voice_editor`は履歴・定型の読込・保存だけを担う。Voice Editorの既存回帰試験は成功し、Firefox実機での二Port接続確認は未完了である。
+
+- 2026-11-16: Firefox実機の`fox-voice-editor`で二Port構成を確認した。共有音声serviceによるマイク・Whisper準備、認識ブロック追加、履歴表示、保存済み表示が同時に成功した。ReazonSpeech選択と各Port切断時の独立性は未確認である。
+
+- 2026-11-16: Firefox実機の`fox-voice-editor`でReazonSpeech K2を選択した二Port構成も確認した。共有音声serviceによるマイク・ReazonSpeech準備、認識ブロック追加、履歴表示、保存済み表示が成功した。各Port切断時の独立性は未確認である。
 
 - 2026-10-29: `foxbook-firefox` の開発用再読込ボタンが表示されない報告を受け、登録判定とアイコンを修正した。更新時はFirefox終了後、登録済み拡張を一つ指定して `install-dev-addon.sh` を再実行し、合成AutoConfigを更新する。Surfaceでの表示・操作は未確認。
 - 2026-10-29: `foxbook-firefox` に `scripts/list-dev-addons.sh` を追加した。`foxbook-control` などの開発用一時拡張について、root管理の登録表を変更せず、登録済みの拡張IDと開発元を `ADDON_ID<TAB>SOURCE_DIR` 形式で確認できる。登録表が不安全な権限・所有者・形式なら読込前に拒否する。
