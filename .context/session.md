@@ -1,13 +1,14 @@
 # Current State
 
-Updated: 1794832249
+Updated: 1794838700
 
 Now:
-- Done: Voice Editorと共有音声serviceの今回の確認を一区切りにし、関連文書と横断管理を整合した。
-- Pending: Surface測定・マイク補正方式などの保留事項は各Todoに記録済み。
+- Done: FOX単独検出の実機結果、負荷、拡張利用時のみの監視案を記録した。
+- Pending: ネイティブ版の比較、拡張連携・マイク排他、Surface性能は未検証。
 
 Next:
-- 次の作業対象はユーザーの指示に合わせる。
+- dynabookでネイティブ版とPython版を同条件で比較する。
+- 登録拡張の利用中だけ監視する運用を設計する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.

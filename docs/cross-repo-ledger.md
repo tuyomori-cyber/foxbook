@@ -38,6 +38,14 @@ Focodexの回答を読み取り専用の別画面へ共有し、Markdownビュ�
 
 以下は記録時点の履歴であり、現状・未確認範囲は最新の記録と各正本を参照する。
 
+- 2026-11-16: ウェイクワード単独診断でdynabookのFOX検出とテレビ音下5分以上の誤検出なしを確認。Python検出処理のCPU平均3.6%、RSS 68,880KBを記録。次はdynabookでネイティブ版と比較し、登録拡張の利用中だけ監視する運用を検討する。拡張連携・マイク排他・Surface性能は未決定・未検証。
+
+- 2026-11-16: foxbook-speechにsherpa-onnx KWS単独診断を追加した。英語モデルと合成音声でHEY FOXを検出、FOXは1件で未検出。Voice Editor・共有service・APIには未統合で、実マイク検証とマイク排他は未完了。同時録音しない運用とする。
+
+- 2026-11-16: Porcupine無料枠AccessKey終了の開発元回答を確認し、sherpa-onnx英語KWSによる`FOX`の検出実験を候補として調査した。最終選定・日本語発音での精度・Surface負荷は未検証。[検討メモ](../../foxbook-speech/specification/ウェイクワード常時待機検討.md)。
+
+- 2026-11-16: ウェイクワードの検討を開始。最初は軽量検出器の単独実験で検出だけを確認し、Voice Editorの自動録音やマイク共有は未実装・未決定。語句の言語、エンジン、Surface性能も未決定。詳細は[foxbook-speechの検討メモ](../../foxbook-speech/specification/ウェイクワード常時待機検討.md)。
+
 - 2026-11-16: 今回のVoice Editor実機確認を一区切りにし、音声service・二Port・マイク補正の現状、30秒上限、実機確認と保留範囲を各正本と検証記録で整合した。`IF-VE-SP-001`は現行実装としてactiveに統一。Surfaceの共有service測定と補正方式などは各TODOに保留する。
 
 - 2026-11-16: dynabook G83/HSのFirefoxで、30秒上限時の自動認識結果表示、履歴への追加、録音上限の案内、次の録音を実機確認した。
