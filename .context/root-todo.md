@@ -4,10 +4,9 @@
 
 ## Now
 
-- Done: 共有音声serviceとVoice Editor二Portを実機確認し、待機中の切断・復旧と状態表示を確認した。
-- Pending: 録音中のキャンセル後にReazonSpeech Workerが5分経過後も残る。録音中のライブラリ切断では録音が継続する。
+- Done: Voice Editorと共有音声serviceの今回の実機確認を一区切りにした。
+- Done: Worker回収、録音中の両Port切断、30秒自動認識・履歴・再録音を確認した。
 
 ## Next
 
-- foxbook-speechのWorker寿命・取消／切断回収を修正・検証する。
-- Voice Editorの録音・認識中のライブラリ切断時の扱いを決め、実装・検証する。
+- 次の作業対象はユーザーの指示に合わせる。保留事項は各リポジトリのTODO.mdを参照する。

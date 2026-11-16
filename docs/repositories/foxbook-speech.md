@@ -23,7 +23,7 @@ updated: 2026-11-16
 
 | 契約ID | 相手 | 役割 | 状態 | 正本 |
 | --- | --- | --- | --- | --- |
-| `IF-VE-SP-001` | fox-voice-editor | 提供側 | draft | [契約](../interfaces/fox-voice-editor--foxbook-speech.md) |
+| `IF-VE-SP-001` | fox-voice-editor | 提供側 | active | [契約](../interfaces/fox-voice-editor--foxbook-speech.md) |
 
 ## 変更時の影響確認
 

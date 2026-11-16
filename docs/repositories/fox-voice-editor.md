@@ -1,6 +1,6 @@
 ---
 repository: fox-voice-editor
-updated: 2026-10-26
+updated: 2026-11-16
 ---
 
 # fox-voice-editor 横断管理
@@ -23,4 +23,5 @@ updated: 2026-10-26
 | `IF-VE-FD-001` | focodex | 送信側 | active | [契約](../interfaces/fox-voice-editor--focodex.md) |
 | `IF-VE-FD-002` | focodex | 再送側 | active | [契約](../interfaces/fox-voice-editor--focodex.md) |
 | `IF-VE-OSK-001` | Firefox-On-Screen-Keyboard | 利用側 | active | [契約](../interfaces/fox-voice-editor--firefox-on-screen-keyboard.md) |
+| `IF-VE-SP-001` | foxbook-speech | 利用側 | active | [契約](../interfaces/fox-voice-editor--foxbook-speech.md) |
 | `IF-SV-001` | foxbook-firefox | 利用側 | experimental | [契約](../interfaces/split-view-operation.md) |
