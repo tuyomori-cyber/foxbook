@@ -1,13 +1,14 @@
 # Current State
 
-Updated: 1794901793
+Updated: 1794908918
 
 Now:
-- Done: THE SESSION TOOLS音声操作のコマンド範囲・導入手順・横断契約を文書化した。
-- Pending: 切断回収、Voice Editorとの同時利用、Surfaceでの実機確認。
+- Done: チューナー表示時の自動開始、非アクティブ時のマイク解放・復帰、競合時の手動再開を実装・自動試験した。
+- Pending: タブ・ウィンドウ切替時のマイク解放と復帰、Voice Editor競合の実機確認。
 
 Next:
-- 音声serviceのKWSと録音引継ぎについて、切断・競合の自動試験と実機確認を行う。
+- 実楽器・実マイクで音名・cent・ストロボ・FOX終了を確認する。
+- ->
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.

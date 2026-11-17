@@ -38,6 +38,18 @@ Focodexの回答を読み取り専用の別画面へ共有し、Markdownビュ�
 
 以下は記録時点の履歴であり、現状・未確認範囲は最新の記録と各正本を参照する。
 
+- 2026-11-17: チューナー表示時に測定を自動開始し、所有タブの非表示・ウィンドウ非アクティブ時はserviceの`stop_tuner`でマイクを解放、復帰時に再取得する。競合時は手動再開を待つ。状態遷移の自動試験済み、実機確認待ち。
+
+- 2026-11-17: チューナーで単一のネイティブ入力をKWSと単音ピッチ解析へ渡し、周波数イベントからストロボ風表示・音名・centを表示する機能とA4基準の保存を追加した。合成音で82〜880Hzを検証。実楽器・Surfaceでの追従性と、非アクティブ時の回収は未確認・未実装。
+
+- 2026-11-17: ReazonSpeechでの認識結果に基づき、THE SESSION TOOLSのチューナー起動語を「チューナー」「チューナー起動して」「チューナーを起動して」「十七」とした。いずれも`FOX`検出後の認識結果への完全一致で判定する。
+
+- 2026-11-17: チューナー中の`FOX`単独検出からlease解放とMetronome表示復帰までを実装した。起動直後1.5秒は検出を無視する。音程解析・入力共有は未実装で、音声終了の実機確認もこれから行う。
+
+- 2026-11-17: THE SESSION TOOLSのチューナー仕様を[現行仕様書](../../THE-SESSION-TOOLS/specification/THE%20SESSION%20TOOLS_仕様書v0.2.md)へ統合し、初期段階として既存パネルのTuner表示、`FOX、チューナー`による起動、表示内クリックによる開始・終了、serviceの単一`tuner` lease予約を実装した。PCMキャプチャ・ピッチ解析・単一キャプチャ共有・チューナー中の`FOX`終了は未実装である。`IF-TST-SP-001`をこの初期契約まで更新した。
+
+- 2026-11-17: THE SESSION TOOLS READMEから公開`foxbook-speech`リポジトリへ導線を追加し、Whisper.cpp、ReazonSpeech、Git LFS、ネイティブKWS、Native Host、ユーザーserviceまでを一続きの初回導入手順として整備した。音声操作の依存関係と正本は`foxbook-speech` READMEとする。
+
 - 2026-11-17: `IF-TST-SP-001`をexperimentalとして追加。THE SESSION TOOLSは`FOX`検出後、3秒のReazonSpeech認識で再生・停止、BPM、音量、Divisionを操作できる。ネイティブKWSはserviceが所有し、検出時に停止して録音へマイクを引き継ぎ、結果後に再待機する。Voice Editorの任意録音UI・契約は変更しない。実機で各コマンドは確認済み、切断回収・同時利用・Surfaceは未確認。
 
 - 2026-11-17: wakeword実用化の最初の利用先をTHE SESSION TOOLSに定めた。The Sessionタブ利用中だけ`FOX`を待機し、検出後のReazonSpeech結果が正規化済み「再生」「停止」の場合だけ既存メトロノームを操作する方針。Native Messaging許可、KWSと録音のマイク排他・回収、結果後の再待機、横断APIと実機検証は未実装。
