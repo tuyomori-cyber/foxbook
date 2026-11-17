@@ -38,6 +38,10 @@ Focodexの回答を読み取り専用の別画面へ共有し、Markdownビュ�
 
 以下は記録時点の履歴であり、現状・未確認範囲は最新の記録と各正本を参照する。
 
+- 2026-11-17: `IF-TST-SP-001`をexperimentalとして追加。THE SESSION TOOLSは`FOX`検出後、3秒のReazonSpeech認識で再生・停止、BPM、音量、Divisionを操作できる。ネイティブKWSはserviceが所有し、検出時に停止して録音へマイクを引き継ぎ、結果後に再待機する。Voice Editorの任意録音UI・契約は変更しない。実機で各コマンドは確認済み、切断回収・同時利用・Surfaceは未確認。
+
+- 2026-11-17: wakeword実用化の最初の利用先をTHE SESSION TOOLSに定めた。The Sessionタブ利用中だけ`FOX`を待機し、検出後のReazonSpeech結果が正規化済み「再生」「停止」の場合だけ既存メトロノームを操作する方針。Native Messaging許可、KWSと録音のマイク排他・回収、結果後の再待機、横断APIと実機検証は未実装。
+
 - 2026-11-16: ウェイクワード単独診断でdynabookのFOX検出とテレビ音下5分以上の誤検出なしを確認。Python検出処理のCPU平均3.6%、RSS 68,880KBを記録。次はdynabookでネイティブ版と比較し、登録拡張の利用中だけ監視する運用を検討する。拡張連携・マイク排他・Surface性能は未決定・未検証。
 
 - 2026-11-16: foxbook-speechにsherpa-onnx KWS単独診断を追加した。英語モデルと合成音声でHEY FOXを検出、FOXは1件で未検出。Voice Editor・共有service・APIには未統合で、実マイク検証とマイク排他は未完了。同時録音しない運用とする。
