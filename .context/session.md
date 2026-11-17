@@ -1,14 +1,12 @@
 # Current State
 
-Updated: 1794908918
+Updated: 1794926221
 
 Now:
-- Done: チューナー表示時の自動開始、非アクティブ時のマイク解放・復帰、競合時の手動再開を実装・自動試験した。
-- Pending: タブ・ウィンドウ切替時のマイク解放と復帰、Voice Editor競合の実機確認。
+- Done: dynabookで「みらい」検出、非アクティブ時の停止・復帰、タブ終了時のマイク解放を確認し、関連文書を更新。
 
 Next:
-- 実楽器・実マイクで音名・cent・ストロボ・FOX終了を確認する。
-- ->
+- 「みらい」でコマンド全種・チューナー・Surfaceの動作と誤検出を検証する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -17,8 +15,8 @@ Constraints:
 Relevant:
 - context: foxbook
 - repo: THE-SESSION-TOOLS
-- repo: fox-voice-editor
-- repo: foxbook
-- repo: foxbook-control
 - repo: foxbook-speech
+- cwd: /home/tuyomori/project/foxbook-control
+- file: .context/session.md
+- file: .context/turns.jsonl
 
