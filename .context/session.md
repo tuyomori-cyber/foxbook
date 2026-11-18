@@ -1,12 +1,12 @@
 # Current State
 
-Updated: 1794926221
+Updated: 1794971230
 
 Now:
-- Done: dynabookで「みらい」検出、非アクティブ時の停止・復帰、タブ終了時のマイク解放を確認し、関連文書を更新。
+- Done: オフライン起動・再生継続・オンライン復帰時の実機確認結果を関連文書へ反映した。
 
 Next:
-- 「みらい」でコマンド全種・チューナー・Surfaceの動作と誤検出を検証する。
+- 設定項目の個別操作と、タブ遷移・オンライン復帰時のマイク回収を直接確認する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -15,8 +15,8 @@ Constraints:
 Relevant:
 - context: foxbook
 - repo: THE-SESSION-TOOLS
+- repo: foxbook
+- repo: foxbook-control
 - repo: foxbook-speech
 - cwd: /home/tuyomori/project/foxbook-control
-- file: .context/session.md
-- file: .context/turns.jsonl
 

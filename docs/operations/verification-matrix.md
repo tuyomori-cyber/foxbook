@@ -12,6 +12,7 @@
 | 垂直タブによる運用 | 既存Split Viewと独立Markdownビューアータブの切替構想 | 未実施 | 未実施 | — | Surfaceで垂直タブ操作と画面幅、非表示中のvoice-editor・Focodexの状態保持。ビューアーは未設計・未実装。 |
 | foxbook-speech service起動 | `IF-VE-SP-001` のservice・Native Host導入前提 | socket、状態遷移、Whisper・ReazonSpeech擬似実行を自動試験済み | tuyomori-IStDXi-M1B6 / systemd 255: user serviceがactive、0600 socket、Native Messaging manifest、両エンジンの実録音・Worker再利用・5分解放を確認。dynabook G83/HS: 両エンジン、Firefox二Port、録音中切断、30秒上限・復旧を確認。 | 2026-11-16 | Surface Pro 4での共有service測定、service再起動後の回復、認識中・保存中の切断実機確認。 |
 | THE SESSION TOOLS → speech | `IF-TST-SP-001`・みらい実験 | Python/C++同一PCMスコア、検出イベント、音程合成音、非アクティブと遅延応答を試験済み | dynabook G83/HS / Firefox: 「みらい」発話検出、非アクティブ時の待機停止・復帰、タブ終了時のマイク解放を確認。C++単独診断は毎回検出、CPU約3.4〜3.9%、RSS約37MiB（arecord別）。 | 2026-11-17 | コマンド全種、チューナーでの「みらい」と解放・復帰、長時間誤検出、Surfaceでの検出・負荷・電力、Voice Editorとの競合。 |
+| THE SESSION TOOLS オフライン運用 | チューナー・メトロノーム・オンライン復帰 | オフライン再生、復帰時の停止応答待ち・遅延開始・停止中の競合を試験済み | 利用者がオフラインチューナー起動、メトロノーム起動・ポップアップ閉鎖後の継続、オンライン復帰後の停止・通常画面切替を確認。端末・Firefoxバージョンは未記録。 | 2026-11-18（利用者報告） | 設定項目の個別操作、タブ遷移・オンライン復帰時のマイク回収のプロセス等による直接確認。 |
 
 補足（2026-11-16）: dynabook G83/HSでWhisper／ReazonSpeechのservice単体認識とVoice Editorの動作を確認。録音中キャンセル後にWorkerが5分で解放され、再読込後に復旧した。変換中と両エンジン認識中の取消・切断は擬似子プロセスによる自動試験で確認し、実機で該当タイミングの取消・切断は未確認。
 
