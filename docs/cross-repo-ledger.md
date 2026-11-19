@@ -41,6 +41,16 @@ Focodexの回答を読み取り専用の別画面へ共有し、Markdownビュ�
 
 以下は記録時点の履歴であり、現状・未確認範囲は最新の記録と各正本を参照する。
 
+- 2026-11-19: 利用者がダミー対象の正常・遅延応答・遅延実行・操作無応答・定義取得無応答の5条件をFirefoxで確認。遅延実行送信直後に設定ページへ移動後、約8秒で操作記録が現れた。端末・Firefoxバージョン未記録。[検証マトリクス](operations/verification-matrix.md)
+
+- 2026-11-19: ダミー対象に遅延応答・遅延実行・無応答の試験モードと操作回数・時刻の記録を追加。自動試験済み、Firefox実機確認待ち。[手順](../../foxbook-speech/assistant-ui/exchange-probe/README.md)
+
+- 2026-11-19: 対象の固定登録・定義取得・結果不明時の再試行の検討を追加。試作に5秒の応答期限を設け、操作要求の時間切れ時は結果不明として操作を無効化する。処理の取消・遅延実行の防止は保証しない。自動試験済み、Firefoxの遅延・無応答は未確認。[検討](decisions/音声操作対象の登録と配送_検討.md)
+
+- 2026-11-19: 利用者が対象拡張の無効化時の操作ボタン無効化・接続エラーと、対象タブの非アクティブ時の `TARGET_INACTIVE` 表示を確認。端末・Firefoxバージョン、非アクティブ時のBPM値は未記録。[IF-AST-TST-001](interfaces/assistant--the-session-tools.md)
+
+- 2026-11-19: 管理試作で操作要求中の二重送信を防止し、通信失敗時は実行結果が不明と表示する。固定IDへの定義取得・古い応答の破棄と再送しない方針を実験契約に記録。自動試験済み、Firefox実機確認・動的登録とタイムアウトは未完了。[IF-AST-TST-001](interfaces/assistant--the-session-tools.md)
+
 - 2026-11-19: 管理拡張からTHE SESSION TOOLSの実験APIを呼び出し、BPMが5増えることを利用者が確認。The Sessionドメインを開いていない場合は失敗したと報告。失敗表示の詳細と、対象タブを残した非アクティブ条件は未確認。[IF-AST-TST-001](interfaces/assistant--the-session-tools.md)
 
 - 2026-11-19: 第2段階の実験として、THE SESSION TOOLSにコマンドJSON取得とアクティブ時のBPM +5を公開し、試作管理拡張からの呼び出しに対応した。実験用拡張ID以外・不正形式・対象非アクティブを拒否する。自動試験済み、Firefox実機確認待ち。音声API・マイク制御は変更しない。[IF-AST-TST-001](interfaces/assistant--the-session-tools.md)

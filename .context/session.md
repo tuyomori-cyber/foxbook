@@ -1,14 +1,12 @@
 # Current State
 
-Updated: 1795082197
+Updated: 1795095867
 
 Now:
-- Done: The Sessionを開いたまま別タブから操作すると失敗することを確認
-- Pending: 非アクティブ時の操作方針を検討
+- Done: ダミー対象の5パターンとポップアップ終了後の遅延実行をFirefoxで確認し、記録。
 
 Next:
-- 対象タブ非アクティブ時の扱いと正式APIの仕様を検討する。
-- ->
+- 正式な対象登録・配送方式とコマンド定義の設計を進める。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
