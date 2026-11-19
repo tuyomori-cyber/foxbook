@@ -1,12 +1,14 @@
 # Current State
 
-Updated: 1794971230
+Updated: 1795082197
 
 Now:
-- Done: オフライン起動・再生継続・オンライン復帰時の実機確認結果を関連文書へ反映した。
+- Done: The Sessionを開いたまま別タブから操作すると失敗することを確認
+- Pending: 非アクティブ時の操作方針を検討
 
 Next:
-- 設定項目の個別操作と、タブ遷移・オンライン復帰時のマイク回収を直接確認する。
+- 対象タブ非アクティブ時の扱いと正式APIの仕様を検討する。
+- ->
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
@@ -15,8 +17,8 @@ Constraints:
 Relevant:
 - context: foxbook
 - repo: THE-SESSION-TOOLS
+- repo: assistant-ui
+- repo: exchange-probe
 - repo: foxbook
 - repo: foxbook-control
-- repo: foxbook-speech
-- cwd: /home/tuyomori/project/foxbook-control
 

@@ -1,6 +1,6 @@
 ---
 repository: foxbook-speech
-updated: 2026-11-16
+updated: 2026-11-19
 ---
 
 # foxbook-speech 横断管理
@@ -10,14 +10,16 @@ updated: 2026-11-16
 - 許可済みFirefox拡張向けの共通音声認識Native Messaging Hostを提供する。
 - ユーザー単位の音声serviceで、マイク排他、録音・変換、Whisper／ReazonSpeech、取消、回収を管理する。
 - 共通音声API、systemd運用、導入・検証手順を管理する。
+- 共通音声アシスタントを音声基盤と分離した構成要素として設ける方針。第1段階としてContent Scriptによる表示試作を管理する。
 
-編集、履歴・定型文、認識後のコマンド解釈、Focodex／OSK連携、端末制御、ファイル操作は所有しない。
+音声serviceとHostは、編集、履歴・定型文、認識後のコマンド解釈、Focodex／OSK連携、端末制御、ファイル操作を所有しない。将来のアシスタントによるコマンド解釈は音声基盤とは分離して設計する。
 
 ## 正本へのリンク
 
 - [README](../../../foxbook-speech/README.md)
 - [仕様書 v0.1](../../../foxbook-speech/specification/foxbook-speech仕様書v0.1.md)
 - [TODO](../../../foxbook-speech/TODO.md)
+- [共通UI表示試作](../../../foxbook-speech/assistant-ui/README.md)
 
 ## 参加インターフェース
 
