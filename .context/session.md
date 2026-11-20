@@ -1,12 +1,13 @@
 # Current State
 
-Updated: 1795095867
+Updated: 1795178226
 
 Now:
-- Done: ダミー対象の5パターンとポップアップ終了後の遅延実行をFirefoxで確認し、記録。
+- Done: 二種類の登録を独立させ、既存の接続・認証を維持して段階的に整備する方針を記録。
+- Pending: 登録情報の形式と管理方法、許可取り消し時の扱いは未決定。
 
 Next:
-- 正式な対象登録・配送方式とコマンド定義の設計を進める。
+- 既存の許可リストを基に、初期登録の具体的な情報と管理方法を検討する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
