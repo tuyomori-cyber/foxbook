@@ -1,13 +1,13 @@
 # Current State
 
-Updated: 1795178226
+Updated: 1795269298
 
 Now:
-- Done: 二種類の登録を独立させ、既存の接続・認証を維持して段階的に整備する方針を記録。
-- Pending: 登録情報の形式と管理方法、許可取り消し時の扱いは未決定。
+- Done: 指定された登場人物による正常系の詳細シーケンス草案を作成。
+- Pending: 橋渡し方式、状態照会API、要求ID付き操作は未確定。
 
 Next:
-- 既存の許可リストを基に、初期登録の具体的な情報と管理方法を検討する。
+- 詳細シーケンスを確認し、未確定の接続・状態管理を検討する。
 
 Constraints:
 - Keep session.md short and optimized for Codex resumption.
